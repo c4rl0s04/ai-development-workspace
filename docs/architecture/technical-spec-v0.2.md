@@ -310,7 +310,7 @@ Validation is introduced with the milestone that implements the behavior. There 
 - Runner/provider tests exercise interrupted starts, duplicate delivery, cancellation, stale callbacks, lost API responses, webhook forgery/reordering, and recovery.
 - UI verification includes keyboard-accessible Kanban alternatives, clear transition failures, specification version comparison, explicit human actions, and honest loading/error/blocked states.
 
-Mocks can isolate provider adapters, but do not prove actual Codex, MCP, Inngest, Neon, Vercel, or GitHub interoperability. Each adopted provider requires a bounded integration validation in its milestone.
+Mocks can isolate provider adapters, but do not prove actual Codex, MCP, Inngest, Supabase, Vercel, or GitHub interoperability. Each adopted provider requires a bounded integration validation in its milestone.
 
 ## 12. Development milestones
 
