@@ -2,7 +2,7 @@
 
 AI Development Workspace is a planned web platform for managing software projects and coordinating AI coding agents. Its vision is to connect requirements, approved technical specifications, isolated agent executions, independent reviews, and GitHub integration in one auditable workflow.
 
-**Status:** architecture and initial repository setup. This repository contains documentation only; no application, integrations, dependencies, or infrastructure have been implemented. The technical specification is a draft awaiting human review before M0 implementation begins.
+**Status:** architecture and initial repository setup. This repository contains documentation only; no application, integrations, dependencies, or infrastructure have been implemented. The current specification records owner-confirmed product decisions; provider interoperability and implementation planning still require validation before M0 coding begins.
 
 ## Planned capabilities and workflow
 
