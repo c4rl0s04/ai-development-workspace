@@ -6,4 +6,6 @@ This directory is an independent disposable Next.js application, authorized befo
 - `app/api/mcp/route.ts` is the stateless resource endpoint; `lib/mcp.ts` owns bearer validation. Server-rendered GitHub login and OAuth consent use Supabase Auth, never an application credential store.
 - `supabase/custom-access-token-hook.sql` is a manual isolated-project setup template, not an applied migration or production schema. Never apply it or provision/deploy resources without a separate user request.
 - `.env.local` and generated output are ignored. `.env.example` contains placeholders only. Do not log tokens, authorization codes, session cookies, or provider responses.
-- Local integration tests use ephemeral signing keys and prove resource-server behavior only. Do not label Supabase/Vercel/Codex interoperability proven until the README live checklist is recorded with real clients.
+- Local integration tests use ephemeral signing keys and prove resource-server behavior only. The owner reported a successful **live Codex CLI OAuth + connection_test** and later connection after a restart; the README records this evidence, but revocation, non-owner denial, token-refresh internals and Desktop remain untested. Do not claim production readiness.
+
+The [architecture guide](../../docs/architecture/mcp-authentication.md) describes the authorization model, while the [setup guide](../../docs/guides/remote-mcp-setup.md) records the reproducible manual configuration. Keep the spike README's validation record current when provider behavior or deployment results change.

@@ -2,7 +2,7 @@
 
 AI Development Workspace is a planned web platform for managing software projects and coordinating AI coding agents. Its vision is to connect requirements, approved technical specifications, isolated agent executions, independent reviews, and GitHub integration in one auditable workflow.
 
-**Status:** architecture and initial repository setup. This repository contains documentation only; no application, integrations, dependencies, or infrastructure have been implemented. The current specification records owner-confirmed product decisions; provider interoperability and implementation planning still require validation before M0 coding begins.
+**Status (2026-10-17):** The product is still at the architecture/pre-M0 stage. The `spike/remote-mcp-auth` branch also contains an **isolated, deployed authentication compatibility prototype** under `spikes/remote-mcp/`. GitHub login, Codex OAuth authorization and an authenticated remote MCP tool call succeeded live; a later call worked after waiting and restarting Codex. The final product, persistence, runner and GitHub repository integration have **not** been implemented. Production security testing remains open.
 
 ## Planned capabilities and workflow
 
@@ -29,13 +29,17 @@ Users will be able to keep using the normal Codex CLI or desktop application. A 
 | Web | Next.js, TypeScript, Tailwind CSS |
 | Structured data | Supabase PostgreSQL, selective JSONB; Drizzle ORM; Zod validation |
 | User identity | Supabase Auth with GitHub sign-in, restricted to one owner |
-| Business rules and agent interface | Application services shared by web and stateless remote MCP endpoint on Vercel; Supabase OAuth 2.1 MCP auth to be validated |
+| Business rules and agent interface | Application services shared by web and stateless remote MCP endpoint on Vercel; Supabase OAuth 2.1 MCP auth (CLI proof of concept validated; security/production adoption pending) |
 | Durable orchestration | Inngest |
 | Agent execution | Codex SDK/CLI in isolated worktrees or sandboxes; separate runner |
 | Repository integration | GitHub App, GitHub API, verified webhooks |
 | Artifacts and hosting | Supabase Storage candidate; Vercel web + MCP hosting; separate future agent runner |
 
 The architectural direction is a modular monolith with a separate agent runner. The current decision baseline is [technical specification v0.2](docs/architecture/technical-spec-v0.2.md); [v0.1](docs/architecture/technical-spec-v0.1.md) is retained as the initial draft. External providers and runtime integration details remain provisional until validated. PostgreSQL will own task workflow; GitHub will own repository and CI facts; object storage will hold large artifact contents.
+
+## MCP authentication research and setup
+
+The versioned [technical specification](docs/architecture/technical-spec-v0.2.md) remains the architectural decision baseline. For the proven remote-auth approach, see [how MCP and OAuth work](docs/architecture/mcp-authentication.md), the [reproducible setup guide](docs/guides/remote-mcp-setup.md), and the [spike implementation and validation record](spikes/remote-mcp/README.md). The spike is not the production application and must not be copied wholesale into M0 without review.
 
 ## Planned milestones
 
@@ -51,4 +55,4 @@ The architectural direction is a modular monolith with a separate agent runner. 
 
 See the [engineering specification](docs/architecture/technical-spec-v0.2.md) for contracts, workflow rules, security boundaries, open decisions, and [milestone acceptance criteria](docs/architecture/technical-spec-v0.2.md#12-development-milestones). Repository-specific contributor instructions are in [AGENTS.md](AGENTS.md).
 
-There are no install, development, build, or test commands yet. Implementation will begin only after the documentation review and a separate implementation request.
+There are no production application build or test commands at the repository root. The isolated compatibility prototype has its own commands in `spikes/remote-mcp/README.md`. M0 implementation remains subject to a separate engineering review and authorization.

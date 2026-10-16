@@ -1,8 +1,21 @@
 # Remote MCP authentication spike
 
-Independent Next.js/TypeScript proof of concept for [specification v0.2](../../docs/architecture/technical-spec-v0.2.md). This is not M0 or the final application. No product schema, agent execution, GitHub repository permissions, cloud resources, or deployment are included.
+Independent Next.js/TypeScript proof of concept for [specification v0.2](../../docs/architecture/technical-spec-v0.2.md). This is not M0 or the final application: it has no product schema, agent execution or GitHub repository permissions. A **manual test deployment** and Supabase configuration exist, but are not provisioned or managed by this repository. For the underlying concepts see [MCP authentication architecture](../../docs/architecture/mcp-authentication.md); for repeating the setup see the [step-by-step guide](../../docs/guides/remote-mcp-setup.md).
 
-**Result so far:** local resource-server integration tests, production build, and HTTP smoke test with a mock issuer pass. Actual Supabase OAuth issuance, refresh, GitHub consent, Vercel hosting and normal Codex CLI/Desktop login still require the live checks below. Do not adopt the architecture based on local tests alone.
+**Result as of 2026-10-17:** Local resource-server integration tests and the mock-issuer HTTP smoke test passed in the initial implementation. In the manually deployed experiment, GitHub browser sign-in, Supabase OAuth consent, Codex CLI login and the authenticated `connection_test` MCP call **passed**. The owner reported a later successful tool call after waiting and reopening Codex. This supports moving to M0 design, **not** production approval; refresh-token exchange was not independently traced, and negative security and Codex Desktop tests remain open.
+
+### Live CLI validation record — 2026-10-17
+
+| Check | Observation | Status |
+| --- | --- | --- |
+| Deployed protected-resource endpoint | Metadata and unauthenticated challenge were checked during setup | Passed (owner report) |
+| Browser GitHub social login | Owner confirmed successful sign-in to the Next.js app | Passed (owner report) |
+| Supabase consent → Codex CLI OAuth | Browser displayed `Authentication complete. You may close this window.` | Passed (owner report) |
+| Remote tool execution | `remote-mcp-spike.connection_test` returned `Authenticated connection successful.` | **Passed (actual Codex tool output provided)** |
+| Later tool call and Codex restart | Owner waited, reopened Codex, and reported tool still working | Passed (owner report); refresh mechanism not independently inspected |
+| Non-owner login, denial, revocation, key rotation, Desktop parity | Not performed | **Pending** |
+
+The original Git branch incorrectly used `z.uuid()` for Supabase's **opaque** OAuth `authorization_id`; this caused `Missing or invalid authorization request`. It was fixed during the live test and is now committed in `lib/oauth.ts` with regression coverage in `tests/oauth.test.ts`. Do not confuse this ID with Supabase's UUID-shaped **OAuth client ID**.
 
 ## Compatibility risks and design
 
@@ -32,7 +45,7 @@ Dependencies are exact-pinned with one independent lockfile. `.npmrc` disables d
 
 `APP_URL` is the canonical origin, without a path. `OWNER_GITHUB_ID` is the numeric GitHub provider ID, not the username, email or Supabase user UUID. `MCP_OAUTH_CLIENT_ID` is a public client identifier, not a Supabase publishable key. `MCP_OAUTH_REDIRECT_URI` must match the registered Codex callback exactly. No service-role key or GitHub OAuth secret belongs in this app or Codex configuration.
 
-## Supabase and GitHub configuration (manual; nothing provisioned)
+## Supabase and GitHub configuration (manual test setup)
 
 Use an isolated test Supabase project; do not install the hook into a shared/production Auth service.
 
@@ -46,7 +59,7 @@ Use an isolated test Supabase project; do not install the hook into a shared/pro
 
 The hook preserves ordinary browser-session audiences. OAuth tokens for other clients never receive this resource audience or owner claim. An ordinary browser session cannot substitute for a third-party OAuth access token.
 
-## Vercel setup (manual; no deployment performed)
+## Vercel setup (manual test deployment exists)
 
 Import this existing repository with **Root Directory `spikes/remote-mcp`**, Next.js framework, Node 24, install command `npm ci --ignore-scripts`, build command `npm run build`, default Next.js output. Set the six variables from `.env.example` privately. Use a stable HTTPS hostname for `APP_URL`, Supabase Site URL and the hook audience; preview URL changes require a new configuration and login.
 
@@ -99,16 +112,16 @@ For Desktop, add/use the same HTTP server through its MCP settings or supported 
 | Actual Next.js HTTP routes | `npm run test:http` after build: mock JWKS, authenticated tool call, unauthenticated rejection, metadata, callback/consent error paths; no cloud traffic |
 | Consent boundaries | Local tests reject alternate client/callback and profile-metadata owner spoofing; live deny/non-owner checks still required |
 | Provider discovery | `npm run check:discovery` against deployed host; save PASS/failure without tokens |
-| Real CLI login | Discovery → code + S256 PKCE → GitHub → owner consent → exact callback → token exchange → tool call |
+| Real CLI login | **Passed, 2026-10-17 (owner demonstration):** Codex OAuth completed and `connection_test` returned the expected text |
 | Desktop login | Repeat using normal Desktop UI and record actual version/callback/client behavior |
-| Audience and refresh | Real access tokens must have issuer, exact resource audience, allowlisted client, owner claim and ≤5-minute lifetime; after expiry Codex refresh must still call successfully |
+| Audience and refresh | A later call worked after waiting and restarting Codex; independent JWT-claim inspection and refresh-grant tracing are **pending**. The resource-server tests reject incorrect issuer/audience/client/owner claims. |
 | Rejection/revocation | Deny consent; try non-owner login; revoke client consent/refresh; reconnect must fail after outstanding access token expiry |
 | No local server | Stop the local Next.js process; both clients must continue reaching deployed tools |
 | Restart/cold instance | Repeat tool call after redeploy/cold start without relying on process state |
 
 Record actual versions, date, deployment host, discovery flags, callback shape, passed/failed checks and sanitized failure categories in a review note. Never paste access/refresh tokens, callback authorization codes, cookies or client secrets. If audience customization breaks issuance/refresh, or callback/client discovery fails, mark the combination **not validated**; do not relax issuer, audience, client or owner checks. The documented STDIO fallback remains a later decision, not part of this spike.
 
-Known limits: JWT revocation has a five-minute window; cached JWKS follows key rotation on library refresh; browser sessions may require sign-in again if a refresh cannot persist during render. Local tests use generated keys, not Supabase. The SQL hook has not been executed here. No production readiness claim is made.
+Known limits: JWT revocation has a five-minute window; cached JWKS follows key rotation on library refresh; browser sessions may require sign-in again if a refresh cannot persist during render. Local tests use generated keys, not Supabase. The **unconfigured** SQL template is in this repo; a customized instance was manually applied and enabled in the isolated test Supabase project. No production readiness claim is made.
 
 ## Official references checked 2026-10-16
 
