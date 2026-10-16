@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
-export const authorizationId = z.uuid();
+// Supabase OAuth authorization IDs are opaque, URL-safe strings (not necessarily UUIDs).
+// This guards input shape only; getAuthorizationDetails() validates the request with Supabase.
+export const authorizationId = z.string().min(16).max(128).regex(/^[A-Za-z0-9_-]+$/);
 
 export function validateClient(details: { client: { id: string }; redirect_uri: string }, clientId: string, callback: string) {
   return details.client.id === clientId && details.redirect_uri === callback;
