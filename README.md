@@ -32,7 +32,7 @@ npm run test:http
 
 To serve the build locally, run `npm start`. The foundation sets anti-framing, content-type, referrer and permissions headers, disables the powered-by header and asks crawlers not to index it. Its CSP constrains framing, objects, base URLs and forms; it is not a complete script policy or an authentication mechanism. Routes contain public placeholder content only. Owner authentication and a stricter deployment-specific policy belong to later milestones, before private data is introduced.
 
-Local verification on 2026-10-17 with Node `v24.21.0` / npm `11.19.0`: clean installation, formatting, lint, typecheck and production build passed; **4 component tests and 1 built-server HTTP test passed**. The dependency audit reported zero vulnerabilities. The shell was inspected in a desktop browser and at a 320px viewport. GitHub Actions itself has not run because this branch has not been pushed.
+Local verification on 2026-10-17 with Node `v24.21.0` / npm `11.19.0`: clean installation, formatting, lint, typecheck and production build passed; **4 component tests and 1 built-server HTTP test passed**. The dependency audit reported zero vulnerabilities. The shell was inspected in a desktop browser and at a 320px viewport. These commands are also the GitHub Actions CI checks; inspect the current PR for hosted results.
 
 ## Structure and boundaries
 
@@ -66,6 +66,8 @@ Supabase owns workflow records; GitHub owns repository/PR/CI facts. No applicati
 
 The separate [`spike/remote-mcp-auth` branch / PR #1](https://github.com/c4rl0s04/ai-development-workspace/pull/1) demonstrated GitHub browser sign-in, Supabase OAuth consent and an authenticated remote Codex CLI `connection_test` call. A later successful call was owner-reported; refresh internals were not independently traced. Local resource-server tests and a corrected Vercel Preview build passed. Non-owner/denial, revocation, token claims/lifetime, key rotation and Desktop parity remain open before production adoption. Its implementation and credentials are not copied into this foundation.
 
-The existing Vercel project still serves that experiment with Root Directory `spikes/remote-mcp`. Agree on Preview/deployment separation before pushing M0; a push could trigger a build against the wrong directory. Do not repoint that project or replace the working production deployment as part of this milestone.
+The M0 dashboard is deployed separately at <https://ai-development-workspace-preview.vercel.app> in Vercel project `ai-development-workspace-preview` (Root Directory `.`). This is a public placeholder deployment, not a production-ready authenticated application.
+
+The existing `ai-development-workspace` Vercel project still serves the OAuth experiment with Root Directory `spikes/remote-mcp` and Git production branch `main`. M0 does not contain that directory: pushing M0 may produce an irrelevant failed Preview there, and merging into `main` may trigger a failed Production build. Before merging, separately authorize isolating that project from `main` (for example, disconnect its Git integration while retaining its existing deployment). Do not repoint it, change its authentication settings or replace its working production deployment as part of M0.
 
 See [AGENTS.md](AGENTS.md) for contributor commands and invariants. Final M0 acceptance and deployment architecture remain subject to human review.
