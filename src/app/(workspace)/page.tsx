@@ -58,9 +58,9 @@ export default function Overview() {
         </h2>
         <div>
           <p className="max-w-2xl text-sm leading-7 text-muted">
-            M1 will introduce owner sign-in, persistent projects, task workflows
-            and versioned approvals. MCP planning follows in M2. No accounts,
-            project data or agent connections are active in this foundation.
+            Owner sign-in protects this workspace. Persistent projects, task
+            workflows and versioned approvals are next in M1. MCP planning
+            follows in M2. No project data or agent connections are active yet.
           </p>
           <p className="mt-4 text-sm font-medium">
             Human approval and execution authorization will remain separate
