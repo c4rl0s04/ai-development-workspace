@@ -75,7 +75,8 @@ test('real PostgreSQL: migrations, constraints, RLS, concurrent writes, rollback
         await assert.rejects(
           () =>
             service.createProject(request, { name: 'Duplicate', key: 'els' }),
-          (e: unknown) => e instanceof WorkspaceError && e.code === 'conflict',
+          (e: unknown) =>
+            e instanceof WorkspaceError && e.code === 'unique_conflict',
         );
         await assert.rejects(
           () =>

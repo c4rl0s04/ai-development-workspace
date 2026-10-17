@@ -63,6 +63,7 @@ export async function respond(work: () => Promise<unknown>, status = 200) {
             status: {
               validation: 400,
               conflict: 409,
+              unique_conflict: 409,
               not_found: 404,
               unavailable: 503,
             }[error.code],

@@ -21,10 +21,12 @@ export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
   const [error, setError] = useState('');
   const [fields, setFields] = useState<Record<string, string[]>>({});
   const [conflict, setConflict] = useState(false);
+  const [uncertain, setUncertain] = useState(false);
+  const [checked, setChecked] = useState(false);
   const titleField = kind === 'project' ? 'name' : 'title';
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (pending) return;
+    if (pending || conflict || uncertain) return;
     const form = new FormData(event.currentTarget);
     const input: Record<string, unknown> = Object.fromEntries(form);
     if (initial) input.revision = initial.revision;
@@ -41,7 +43,8 @@ export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
       });
       const data = await response.json();
       if (!response.ok) {
-        setConflict(response.status === 409);
+        setConflict(data.error?.code === 'conflict');
+        if (!initial && response.status >= 500) setUncertain(true);
         setError(
           data.error?.message ??
             'The save could not be confirmed. Reload before retrying.',
@@ -49,9 +52,15 @@ export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
         setFields(data.error?.fields ?? {});
         return;
       }
+      if (
+        typeof data.location !== 'string' ||
+        !data.location.startsWith('/projects/')
+      )
+        throw new Error('Unconfirmed save');
       router.push(data.location);
       router.refresh();
     } catch {
+      if (!initial) setUncertain(true);
       setError(
         'The save could not be confirmed. Your input is still here; reload the record before retrying.',
       );
@@ -82,6 +91,45 @@ export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
             </Link>
           ) : null}
         </div>
+      ) : null}
+      {uncertain ? (
+        <section aria-label="Reconcile previous create" className="space-y-3">
+          <p>
+            The previous create may have succeeded. Do not submit again until
+            you check the saved list for this project key or task title and
+            description, including later list pages. If storage is unavailable
+            or the request may still be completing, wait before confirming. Your
+            input remains below.
+          </p>
+          <a
+            href={cancelHref}
+            target="_blank"
+            rel="noreferrer"
+            className="underline"
+          >
+            Check saved records in a new tab
+          </a>
+          <label className="block">
+            <input
+              type="checkbox"
+              checked={checked}
+              onChange={(event) => setChecked(event.target.checked)}
+            />{' '}
+            I checked the latest saved records and this record was not created.
+          </label>
+          <button
+            type="button"
+            disabled={!checked}
+            onClick={() => {
+              setUncertain(false);
+              setChecked(false);
+              setError('');
+            }}
+            className="underline disabled:opacity-60"
+          >
+            Allow another create attempt
+          </button>
+        </section>
       ) : null}
       <div>
         <label htmlFor={titleField} className="font-medium">
@@ -178,7 +226,7 @@ export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
       <div className="flex flex-wrap items-center gap-4">
         <button
           type="submit"
-          disabled={pending || conflict}
+          disabled={pending || conflict || uncertain}
           className="min-h-11 rounded-lg bg-accent px-5 py-2.5 font-medium text-white hover:bg-accent-hover disabled:opacity-60"
         >
           {pending ? 'Saving…' : initial ? 'Save changes' : `Create ${kind}`}

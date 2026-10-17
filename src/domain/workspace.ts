@@ -106,6 +106,7 @@ export class WorkspaceError extends Error {
     public readonly code:
       | 'validation'
       | 'conflict'
+      | 'unique_conflict'
       | 'not_found'
       | 'unavailable',
     message: string,

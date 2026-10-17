@@ -62,7 +62,7 @@ export function postgresWorkspaceStore(db: Database): WorkspaceStore {
         cause.code === '23505'
       )
         throw new WorkspaceError(
-          'conflict',
+          'unique_conflict',
           'That project key or repository association already exists. Choose a unique key or reload.',
         );
       throw new WorkspaceError(
