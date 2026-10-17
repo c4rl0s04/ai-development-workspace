@@ -1,13 +1,13 @@
 # M1.1 owner-only browser authentication
 
-Implementation for [Issue #5](https://github.com/c4rl0s04/ai-development-workspace/issues/5), within [M1 / Issue #4](https://github.com/c4rl0s04/ai-development-workspace/issues/4) and [specification v0.2](../architecture/technical-spec-v0.2.md). Code and local tests exist; live M1 authentication is **not validated**. No Supabase/Vercel/GitHub configuration was changed for this work.
+Implementation for [Issue #5](https://github.com/c4rl0s04/ai-development-workspace/issues/5), within [M1 / Issue #4](https://github.com/c4rl0s04/ai-development-workspace/issues/4) and [specification v0.2](../architecture/technical-spec-v0.2.md). Real local and hosted owner GitHub login/logout have passed using the existing shared Supabase project. Hosted validation found a raw React-payload authorization gap; Proxy now rejects unauthorized page requests before rendering, with regression coverage. Preview variables were configured only for this branch; Production and MCP configuration were preserved.
 
 ## What is implemented
 
 - GitHub social sign-in through Supabase Auth, using `@supabase/ssr` PKCE. There is no browser Supabase client or frontend token store.
 - Owner checks derive the stable GitHub identity `id` from Auth's server-fetched `getUser()` record, bound to the verified token's subject. Usernames, emails, `user_metadata`, cookie-embedded users and request headers cannot establish owner authority.
 - Verified claims must describe a non-anonymous `authenticated` browser session. OAuth-client `client_id` tokens and MCP resource audiences are rejected. This does not implement Supabase's OAuth authorization server or any MCP tools.
-- `/`, `/projects` and `/approvals` live in a protected route group. The Next.js Proxy refreshes cookies, but is not the sole authorization boundary. **Every future private data loader/service must call `requireOwner()`; every cookie-authenticated POST mutation must call `requireOwnerMutation(request)`** from `src/server/auth.ts` before reading/changing protected data. Do not accept a request-supplied principal.
+- `/`, `/projects` and `/approvals` live in a protected route group. The Next.js Proxy verifies owner access before page rendering and propagates refresh cookies; the protected layout independently verifies access. Proxy is not the sole authorization boundary. **Every future private data loader/service must call `requireOwner()`; every cookie-authenticated POST mutation must call `requireOwnerMutation(request)`** from `src/server/auth.ts` before reading/changing protected data. Do not accept a request-supplied principal.
 - `src/application/auth/owner.ts` owns authorization policy and its typed identity-reader port. `src/infrastructure/auth` implements Supabase and cookie interactions. `src/server/auth.ts` is the server-only composition entry point, binding the port to the current request and configured owner. Pure policy functions are not request adapters.
 - Cookies use host-only `aw-auth` names, HttpOnly, SameSite=Lax, Path=/ and Secure on HTTPS. Refresh writes update both the incoming request and outgoing response, including chunked cookies. No session/principal is cached globally. Protected and auth-handler responses use private/no-store caching.
 
@@ -54,7 +54,11 @@ Real GitHub login using the existing shared project succeeded locally on 2026-10
 
 Browser testing found and fixed two header interactions: Chromium applies form-action to OAuth POST redirects, so CSP allows only self, the validated Supabase origin and GitHub; private responses use same-origin Referrer-Policy so legitimate same-origin POSTs retain Origin while cross-origin referrers remain suppressed. No CSRF checks were relaxed.
 
-The MCP connection_test succeeded before browser testing. Hosted authentication remains pending Preview setup and deployment.
+Hosted owner login, Overview/Projects/Approvals, direct navigation, reload and logout passed on the stable branch origin below. Missing-Origin and cross-origin logout requests returned 403; an unauthenticated protected POST returned 401. A malformed session cookie redirected to login. No real second-account login or wall-clock expiry/revocation measurement is claimed; wrong-owner, expired and refresh cases use automated fixtures. Runtime error/warning scan returned zero records. MCP connection_test passed after hosted logout.
+
+Stable branch origin: `https://ai-development-work-git-9c7d34-carlosandreshuete-1394s-projects.vercel.app`. The owner registered exactly this origin's `/auth/callback` in Supabase. APP_URL, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY and OWNER_GITHUB_ID target only Preview / feature/m1-owner-auth. Production environment setup requires a separate review before merge. Automatic Git deployments remain disabled; Preview updates currently require authorized manual Git-source deployments.
+
+Vercel CLI generated a deployment-protection bypass token during the bootstrap HTTP verification. Protection remains enabled; do not copy its value into documentation, logs or source.
 
 ## Required live checks before accepting M1.1
 

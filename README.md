@@ -2,7 +2,7 @@
 
 A workspace for connecting software projects, versioned specifications, human decisions and supervised coding agents.
 
-**Current branch: M1.1 owner-only authentication on the merged M0 foundation.** The root Next.js dashboard now has a Supabase/GitHub browser authentication boundary. Projects and Approvals remain honest product placeholders; no project data, task operations, approvals, MCP or agents are implemented. Authentication has local automated coverage; live M1 provider/Preview validation is pending. The currently deployed main dashboard remains M0 until a separately authorized push/deployment.
+**Current branch: M1.1 owner-only authentication on the merged M0 foundation.** The root Next.js dashboard now has a Supabase/GitHub browser authentication boundary. Projects and Approvals remain honest product placeholders; no project data, task operations, approvals, MCP or agents are implemented. Real local and hosted GitHub owner login/logout passed using the shared Supabase project; see the validation guide for limits. The currently deployed main dashboard remains M0 until a separately authorized push/deployment.
 
 ## Run locally
 
@@ -32,7 +32,7 @@ npm run test:http
 
 To serve the build locally, run `npm start`. The foundation sets anti-framing, content-type, referrer and permissions headers, disables the powered-by header and asks crawlers not to index it. Its CSP constrains framing, objects, base URLs and forms; it is not a complete script policy or an authentication mechanism. The workspace is owner-protected, but its product content is still placeholder-only. A complete deployment-specific CSP and real-world authentication checks remain required before private data is introduced. The browser Auth flow is separate from future MCP client OAuth authorization.
 
-Local verification on 2026-10-17 with Node `v24.21.0` / npm `11.19.0`: clean install, formatting, lint, typecheck and credential-free production build passed; **10 component/policy tests and 2 built-server HTTP scenarios passed**. The dependency audit reported zero vulnerabilities. The existing CI commands include the new tests. This branch is local-only; no M1 hosted CI or live authentication result is claimed.
+Local verification on 2026-10-17 with Node `v24.21.0` / npm `11.19.0`: clean install, formatting, lint, typecheck and credential-free production build passed; **10 component/policy tests and 2 built-server HTTP scenarios passed**. The dependency audit reported zero vulnerabilities. The existing CI commands include the new tests. GitHub Actions passed, and real local/hosted owner login, navigation, reload and logout passed. Wrong-owner and expired-session cases use automated fixtures; real token-expiry/revocation checks remain open.
 
 ## Structure and boundaries
 
@@ -43,7 +43,7 @@ src/
   application/auth/    Owner/CSRF policy and identity-reader contract
   infrastructure/auth/ Supabase SSR, cookies and config validation
   server/auth.ts       Server-only request-bound authorization entry points
-  proxy.ts             Refresh propagation and early mutation checks
+  proxy.ts             Early owner authorization and refresh propagation
   components/          Shared presentation and navigation
 tests/                 Component rendering and built-server checks
 .github/workflows/     Local-check parity in GitHub Actions
