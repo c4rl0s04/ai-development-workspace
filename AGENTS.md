@@ -30,4 +30,14 @@ Use relevant installed global skills when they materially support the milestone;
 - Every future private service/loader must call `requireOwner()` and cookie-authenticated POST mutations must call `requireOwnerMutation(request)` from `src/server/auth.ts`. Neither a protected layout nor Proxy is sufficient authorization for data operations. Never accept a caller-supplied principal; never authorize from `getSession()` or mutable metadata.
 - Auth runtime requires `APP_URL`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` and `OWNER_GITHUB_ID`, all server-only. Build succeeds without them; runtime access fails closed. Use `.env.example` and [owner-auth setup](docs/guides/owner-auth.md). Do not log tokens, codes, cookies or provider responses. Never copy OAuth-spike configuration into this app. The independent `spike/remote-mcp-auth` branch and its Vercel project remain separate; do not import spike modules, provision resources, change its Root Directory, or push/deploy without explicit authorization.
 - Completion requires focused tests and a production build, honest placeholder copy, accessible responsive navigation, no secrets or generated artifacts, and preservation of the workflow/authority rules above.
-- Do not push/deploy this auth branch until the isolated development Supabase project and branch-specific Vercel Preview variables/callback are reviewed and authorized. Do not change the existing MCP Supabase project, hooks, OAuth callbacks or deployment. GitHub Actions can verify local mock behavior but does not replace the live checklist in the auth guide.
+- Do not push/deploy this auth branch until local OAuth succeeds and branch-specific Vercel Preview variables/callback are configured. Reuse the existing shared Supabase project tbifhoubudkmxeisvzhh; no new project or GitHub OAuth App. Do not change the existing MCP Supabase project, hooks, OAuth callbacks or deployment. GitHub Actions can verify local mock behavior but does not replace the live checklist in the auth guide.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

@@ -32,7 +32,7 @@ npm run test:http
 
 To serve the build locally, run `npm start`. The foundation sets anti-framing, content-type, referrer and permissions headers, disables the powered-by header and asks crawlers not to index it. Its CSP constrains framing, objects, base URLs and forms; it is not a complete script policy or an authentication mechanism. The workspace is owner-protected, but its product content is still placeholder-only. A complete deployment-specific CSP and real-world authentication checks remain required before private data is introduced. The browser Auth flow is separate from future MCP client OAuth authorization.
 
-Local verification on 2026-10-17 with Node `v24.21.0` / npm `11.19.0`: clean install, formatting, lint, typecheck and credential-free production build passed; **9 component/policy tests and 2 built-server HTTP scenarios passed**. The dependency audit reported zero vulnerabilities. The existing CI commands include the new tests. This branch is local-only; no M1 hosted CI or live authentication result is claimed.
+Local verification on 2026-10-17 with Node `v24.21.0` / npm `11.19.0`: clean install, formatting, lint, typecheck and credential-free production build passed; **10 component/policy tests and 2 built-server HTTP scenarios passed**. The dependency audit reported zero vulnerabilities. The existing CI commands include the new tests. This branch is local-only; no M1 hosted CI or live authentication result is claimed.
 
 ## Structure and boundaries
 
@@ -74,4 +74,4 @@ The existing `ai-development-workspace` Vercel project still serves the OAuth ex
 
 The `ai-development-workspace-preview` Vercel project remains connected to the repository and uses `main` as its production branch. A future authorized merge into `main` will deploy the root dashboard **only to the dashboard project**; feature pushes can also trigger Preview builds. Do not push M1 until its branch-specific Preview environment/callback configuration is reviewed and authorized. The currently deployed main app remains the public M0 placeholder; the local M1 branch must not be deployed until its auth setup is approved. Do not reconnect or repoint the isolated MCP project; integrating MCP into the real app is separate work for M2.
 
-See [AGENTS.md](AGENTS.md) for contributor commands and invariants. M1.1 acceptance, the Supabase development-project choice and Preview configuration remain subject to human review. Prefer a separate development Auth project; the exact setup and real-world checks are in [the auth guide](docs/guides/owner-auth.md).
+See [AGENTS.md](AGENTS.md) for contributor commands and invariants. M1.1 acceptance, the shared Supabase integration and Preview configuration remain subject to human review. The owner chose to reuse the existing Supabase Auth project; the exact setup and real-world checks are in [the auth guide](docs/guides/owner-auth.md).

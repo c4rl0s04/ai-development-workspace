@@ -25,33 +25,36 @@ Origin must match `APP_URL` exactly; missing/`null`/cross-site origins fail. Sam
 
 Access tokens already issued may remain valid until expiry after sign-out/revocation. Fresh `getUser()` checks are not a promise of immediate JWT revocation. Live TTL and revocation behavior must be measured before introducing sensitive data; stricter session revocation enforcement is a later explicit decision. A non-owner may acquire a Supabase Auth account before the application denies workspace access. Account-creation restrictions and rate limits are provider configuration, not application tables in this slice.
 
-## Supabase project choice (approval required)
+## Shared Supabase project decision
 
-| Option | Benefits | Impact / risk |
-| --- | --- | --- |
-| **Separate development project — recommended** | Independent users, GitHub provider, redirects, keys and signing settings; the working MCP experiment remains isolated. | Requires an explicitly authorized project and a separate GitHub OAuth App; later database migration work starts in M1.2. Do not copy the MCP token hook. |
-| Existing experiment project | Reuses an existing Auth service and GitHub provider. | Shared users, provider/site redirect configuration and custom token hook; changes can disrupt MCP. Existing hook preserves ordinary browser audiences but rewrites tokens for its allowlisted OAuth client. Compatibility must be checked before approving reuse. |
+The owner chose to reuse project `tbifhoubudkmxeisvzhh` (`https://tbifhoubudkmxeisvzhh.supabase.co`). Do not create another Supabase project or GitHub OAuth App. Shared users, provider settings and the token hook couple this app to the MCP experiment; preserve all existing configuration.
 
-The spike's reusable findings are server-verified GitHub identity, PKCE callback handling, server cookies and local-session logout. Its OAuth client registration, consent page, custom audience hook and MCP resource are deliberately excluded. Do not change the experiment's Site URL, provider callback, OAuth registrations, hook, tokens or secrets to make M1 work.
+The existing hook changes audience and adds `github_provider_id` only for its registered MCP OAuth client. Browser authorization does not require that claim: it verifies normal browser claims and the GitHub provider identity returned by Auth. Keep the MCP OAuth client, token hook and consent configuration unchanged.
 
-## Exact configuration plan (do not execute before review)
+## Configuration
 
-1. Authorize the isolated Supabase development project and a separate GitHub OAuth App. Keep the MCP project unchanged. In the **new** GitHub OAuth App, set the provider callback to `https://<development-project-ref>.supabase.co/auth/v1/callback`. Store its client ID/secret only in that development project's GitHub provider settings; request no repository scopes.
-2. Enable GitHub social login in the development project. Disable anonymous/unused sign-in methods and manual identity linking. Retain default asymmetric signing. Do not enable an OAuth authorization server or any custom token hook for M1.1. Confirm provider rate limits before exposing login.
-3. Choose a stable **branch-specific Preview origin** for M1 on `ai-development-workspace-preview`. Record the actual Vercel branch URL or separately approved domain, not an invented URL. Its current main/production hostname serves M0 and must not be reused as the M1 callback while it still serves M0. Keep deployment protection enabled; verify that browser callbacks work with it rather than adding bypass secrets.
-4. Set the development Supabase Site URL to that canonical M1 HTTPS origin and allow exactly `<M1_ORIGIN>/auth/callback`. For local work, additionally allow `http://127.0.0.1:3000/auth/callback` (or an explicitly chosen loopback port). No wildcard preview-host allowlist. The GitHub-to-Supabase callback and Supabase-to-Next.js callback are different URLs.
-5. Configure these four **server-only** app variables. Local values go in private `.env.local`; Vercel values must target **Preview**, restricted to `feature/m1-owner-auth`. Do not set/overwrite Production targets or the MCP project's variables.
+Local `.env.local` is ignored and private. Never overwrite an existing environment file. Required server-only variables:
 
-| Variable | Required value |
+| Variable | Local value / Preview requirement |
 | --- | --- |
-| `APP_URL` | Local `http://127.0.0.1:3000`; Preview the exact stable M1 HTTPS origin, no path/query/credentials. |
-| `SUPABASE_URL` | `https://<development-project-ref>.supabase.co` (origin only). |
-| `SUPABASE_PUBLISHABLE_KEY` | The development project's `sb_publishable_...` key. Secret/service-role and legacy JWT keys are rejected. |
-| `OWNER_GITHUB_ID` | `159822857`, the stable numeric provider ID from Issue #5. Not the username or Supabase user UUID. |
+| `APP_URL` | `http://127.0.0.1:3000`; Preview must use Vercel's confirmed stable branch origin. |
+| `SUPABASE_URL` | `https://tbifhoubudkmxeisvzhh.supabase.co` |
+| `SUPABASE_PUBLISHABLE_KEY` | Existing project's publishable key; never service-role or legacy JWT keys. |
+| `OWNER_GITHUB_ID` | `159822857` |
 
-No `NEXT_PUBLIC_*`, GitHub secret, database URL, MCP client ID or service-role key belongs in the app. Build succeeds without these variables; protected runtime requests return 503 and login is unavailable until valid configuration exists. This fail-closed behavior is not permission to push an incomplete auth deployment. Review Preview configuration and explicitly authorize push/deploy first.
+The owner added `http://127.0.0.1:3000/auth/callback` to allowed Supabase redirects. Preserve Site URL and all existing redirects. Add only the exact confirmed M1 Preview origin's `/auth/callback`; never wildcard aliases. The existing GitHub-to-Supabase callback remains unchanged.
 
-For local configuration, copy `.env.example` only if `.env.local` does not already exist. Never overwrite another worktree's environment or reuse its Vercel link. Install and checks remain those in the root README; automated HTTP tests override configuration with an ephemeral local mock Auth server and do not contact Supabase.
+On Vercel, target only project `ai-development-workspace-preview` (`prj_HLgUvRzHvl9nugIF6TbAE1sEtCOm`), **Preview**, branch `feature/m1-owner-auth`. Do not change Production variables, deployment protection or the disconnected MCP project. Confirm the actual branch alias before setting APP_URL; do not guess a generated hostname. Push only after local OAuth and required Preview setup pass. Production configuration needs separate review before merge.
+
+No GitHub secret, database URL, MCP client ID or service-role key belongs in the app. Automated tests use local mock Auth and ephemeral signing keys; builds need no credentials. Missing configuration fails closed.
+
+## Local browser validation
+
+Real GitHub login using the existing shared project succeeded locally on 2026-10-17. Existing GitHub authorization completed without an interactive prompt. Owner access to Overview, Projects and Approvals, direct navigation, reload persistence and logout were verified. After logout, direct Approvals access redirected to login. No real non-owner login or wall-clock token-expiry test is claimed; those cases have automated coverage.
+
+Browser testing found and fixed two header interactions: Chromium applies form-action to OAuth POST redirects, so CSP allows only self, the validated Supabase origin and GitHub; private responses use same-origin Referrer-Policy so legitimate same-origin POSTs retain Origin while cross-origin referrers remain suppressed. No CSRF checks were relaxed.
+
+The MCP connection_test succeeded before browser testing. Hosted authentication remains pending Preview setup and deployment.
 
 ## Required live checks before accepting M1.1
 
