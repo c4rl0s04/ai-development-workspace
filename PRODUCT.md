@@ -16,7 +16,7 @@ A single owner will manage software projects, versioned specifications, human ap
 
 ## Current scope
 
-The merged M0 foundation provides a responsive shell with Overview, Projects and Approvals placeholders. Issues #4/#5 authorize M1.1: server-verified owner-only GitHub login through Supabase Auth. Local authentication tests exist; live M1 setup/validation awaits approval. No sample business records, persistence, task operations, MCP or execution.
+M1.1 owner-only GitHub login is merged and Production login is owner-confirmed. The local M1.2 slice adds persistent projects, repository associations and Backlog tasks, with revision-checked editing. Approvals, Kanban transitions, specifications, MCP and execution are not implemented. Hosted data awaits Issue #7 hardening review and separate migration/deployment approval.
 
 ## Accessibility
 

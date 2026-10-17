@@ -1,6 +1,6 @@
 # M1.1 owner-only browser authentication
 
-Implementation for [Issue #5](https://github.com/c4rl0s04/ai-development-workspace/issues/5), within [M1 / Issue #4](https://github.com/c4rl0s04/ai-development-workspace/issues/4) and [specification v0.2](../architecture/technical-spec-v0.2.md). Real local and hosted owner GitHub login/logout have passed using the existing shared Supabase project. Hosted validation found a raw React-payload authorization gap; Proxy now rejects unauthorized page requests before rendering, with regression coverage. Preview variables were configured only for this branch; Production and MCP configuration were preserved.
+Implementation for [Issue #5](https://github.com/c4rl0s04/ai-development-workspace/issues/5), within [M1 / Issue #4](https://github.com/c4rl0s04/ai-development-workspace/issues/4) and [specification v0.2](../architecture/technical-spec-v0.2.md). Real local and hosted owner GitHub login/logout have passed using the existing shared Supabase project. Hosted validation found a raw React-payload authorization gap; Proxy now rejects unauthorized page requests before rendering, with regression coverage. Preview variables were configured only for this branch; MCP configuration was preserved. M1.1 has since been squash-merged into main at 53b7d7b and the owner confirms real Production GitHub login works; the earlier Preview evidence below remains historical.
 
 ## What is implemented
 
@@ -44,7 +44,7 @@ Local `.env.local` is ignored and private. Never overwrite an existing environme
 
 The owner added `http://127.0.0.1:3000/auth/callback` to allowed Supabase redirects. Preserve Site URL and all existing redirects. Add only the exact confirmed M1 Preview origin's `/auth/callback`; never wildcard aliases. The existing GitHub-to-Supabase callback remains unchanged.
 
-On Vercel, target only project `ai-development-workspace-preview` (`prj_HLgUvRzHvl9nugIF6TbAE1sEtCOm`), **Preview**, branch `feature/m1-owner-auth`. Do not change Production variables, deployment protection or the disconnected MCP project. Confirm the actual branch alias before setting APP_URL; do not guess a generated hostname. Push only after local OAuth and required Preview setup pass. Production configuration needs separate review before merge.
+On Vercel, target only project `ai-development-workspace-preview` (`prj_HLgUvRzHvl9nugIF6TbAE1sEtCOm`), **Preview**, branch `feature/m1-owner-auth`. Do not change Production variables, deployment protection or the disconnected MCP project. Confirm the actual branch alias before setting APP_URL; do not guess a generated hostname. Push only after local OAuth and required Preview setup pass. This was the M1.1 Preview rollout plan. Production Auth was subsequently configured and verified by the owner; future persistence credentials still need separate review.
 
 No GitHub secret, database URL, MCP client ID or service-role key belongs in the app. Automated tests use local mock Auth and ephemeral signing keys; builds need no credentials. Missing configuration fails closed.
 
@@ -56,11 +56,11 @@ Browser testing found and fixed two header interactions: Chromium applies form-a
 
 Hosted owner login, Overview/Projects/Approvals, direct navigation, reload and logout passed on the stable branch origin below. Missing-Origin and cross-origin logout requests returned 403; an unauthenticated protected POST returned 401. A malformed session cookie redirected to login. No real second-account login or wall-clock expiry/revocation measurement is claimed; wrong-owner, expired and refresh cases use automated fixtures. Runtime error/warning scan returned zero records. MCP connection_test passed after hosted logout.
 
-Stable branch origin: `https://ai-development-work-git-9c7d34-carlosandreshuete-1394s-projects.vercel.app`. The owner registered exactly this origin's `/auth/callback` in Supabase. APP_URL, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY and OWNER_GITHUB_ID target only Preview / feature/m1-owner-auth. Production environment setup requires a separate review before merge. Project-wide Git settings were left unchanged. The initial push produced no deployment, but later correction/documentation pushes did produce automatic Preview builds; do not infer automatic-build behavior solely from gitProviderOptions.createDeployments.
+Stable branch origin: `https://ai-development-work-git-9c7d34-carlosandreshuete-1394s-projects.vercel.app`. The owner registered exactly this origin's `/auth/callback` in Supabase. APP_URL, SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY and OWNER_GITHUB_ID target only Preview / feature/m1-owner-auth. Production M1.1 login is now owner-confirmed; M1.2 database environment setup requires a separate review. Project-wide Git settings were left unchanged. The initial push produced no deployment, but later correction/documentation pushes did produce automatic Preview builds; do not infer automatic-build behavior solely from gitProviderOptions.createDeployments.
 
 Vercel CLI generated a deployment-protection bypass token during the bootstrap HTTP verification. Protection remains enabled; do not copy its value into documentation, logs or source.
 
-## Required live checks before accepting M1.1
+## Remaining live hardening — Issue #7 before private hosted data
 
 Use normal GitHub browser sign-in on the approved M1 Preview, recording only sanitized statuses and versions:
 
@@ -71,7 +71,7 @@ Use normal GitHub browser sign-in on the approved M1 Preview, recording only san
 5. Cross-origin or Origin-less mutations fail; legitimate same-origin logout clears all app cookies and returns to login. Another device's session and the MCP `connection_test` remain intact. Check logout when Supabase is unavailable.
 6. Verify no authenticated HTML or Set-Cookie response is cached/shared, no provider details/tokens/codes appear in logs or page errors, and no production/MCP settings changed. Record Vercel and Supabase versions plus outcome without credentials.
 
-Local generated fixtures test resource/session behavior, not GitHub/Supabase interoperability. No database tables, migrations, project/task CRUD, MCP tools, teams or execution are included.
+Local generated fixtures test resource/session behavior, not GitHub/Supabase interoperability. M1.1 contained no database tables or CRUD. M1.2 adds these locally; see the persistence guide. MCP tools, teams and execution remain excluded.
 
 ## References checked during implementation
 

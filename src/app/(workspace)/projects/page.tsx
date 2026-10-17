@@ -41,7 +41,7 @@ export default async function Projects({
               <li key={project.id} className="py-5 first:pt-0 last:pb-0">
                 <Link
                   href={`/projects/${project.id}`}
-                  className="text-lg font-semibold underline decoration-line hover:decoration-accent"
+                  className="break-words text-lg font-semibold underline decoration-line hover:decoration-accent"
                 >
                   {project.name}
                 </Link>
@@ -61,7 +61,9 @@ export default async function Projects({
           </ul>
         ) : (
           <>
-            <h2 className="text-xl font-semibold">No projects yet</h2>
+            <h2 className="text-xl font-semibold">
+              {page === 1 ? 'No projects yet' : 'No projects on this page'}
+            </h2>
             <p className="mt-3 text-muted">
               Create your first project to start capturing tasks.
             </p>

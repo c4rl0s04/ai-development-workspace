@@ -25,7 +25,12 @@ export default async function EditProject({
         kind="project"
         endpoint={`/api/projects/${project.id}`}
         cancelHref={`/projects/${project.id}`}
-        initial={project}
+        initial={{
+          name: project.name,
+          description: project.description,
+          repositoryUrl: project.repositoryUrl,
+          revision: project.revision,
+        }}
       />
     </>
   );

@@ -7,8 +7,8 @@ export function PageHeading({
 }) {
   return (
     <header className="mb-10 flex flex-wrap items-start justify-between gap-5 sm:mb-14">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+      <div className="min-w-0 max-w-full">
+        <h1 className="break-words text-3xl font-semibold tracking-tight sm:text-4xl">
           {title}
         </h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-muted">

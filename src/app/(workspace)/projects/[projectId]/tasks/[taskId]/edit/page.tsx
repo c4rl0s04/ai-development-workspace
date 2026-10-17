@@ -28,7 +28,11 @@ export default async function EditTask({
         kind="task"
         endpoint={`/api/projects/${project.id}/tasks/${task.id}`}
         cancelHref={`/projects/${project.id}/tasks/${task.id}`}
-        initial={task}
+        initial={{
+          title: task.title,
+          description: task.description,
+          revision: task.revision,
+        }}
       />
     </>
   );
