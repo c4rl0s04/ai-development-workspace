@@ -2,7 +2,10 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { AccessError } from './application/auth/owner';
 import { authConfig } from './server/auth';
 import { requestAuth, privateResponse } from './infrastructure/auth/supabase';
-import { authorizeOwnerMutation } from './application/auth/owner';
+import {
+  authorizeOwner,
+  authorizeOwnerMutation,
+} from './application/auth/owner';
 import { readVerifiedIdentity } from './infrastructure/auth/supabase';
 
 export async function proxy(request: NextRequest) {
@@ -26,12 +29,21 @@ export async function proxy(request: NextRequest) {
         settings.ownerGithubId,
       );
     } else {
-      // Refresh here; page and service authorization independently verify the user.
-      await readVerifiedIdentity(auth.client);
+      // Authorize before React can serialize parallel child routes into a redirect.
+      await authorizeOwner(
+        () => readVerifiedIdentity(auth.client),
+        settings.ownerGithubId,
+      );
     }
     return auth.finish(NextResponse.next({ request }));
   } catch (error) {
     if (error instanceof AccessError && error.reason !== 'unavailable') {
+      if (['GET', 'HEAD'].includes(request.method)) {
+        const reason = error.reason === 'forbidden' ? 'denied' : 'expired';
+        return auth.finish(
+          NextResponse.redirect(`${settings.appOrigin}/login?error=${reason}`),
+        );
+      }
       return auth.finish(
         new NextResponse('Access denied', {
           status: error.reason === 'unauthenticated' ? 401 : 403,

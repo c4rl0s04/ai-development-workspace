@@ -223,6 +223,17 @@ test('built app enforces real SSR cookie boundaries with a local mock Auth serve
         unauthenticated.headers.get('location') ?? '',
         /\/login\?error=expired$/,
       );
+      const deniedBody = await unauthenticated.text();
+      assert.doesNotMatch(
+        deniedBody,
+        /A place for the work ahead|Project management is not implemented|approval inbox is not implemented/,
+      );
+      const invalidSession = await get(path, 'aw-auth=invalid-session-fixture');
+      assert.equal(invalidSession.status, 307);
+      assert.doesNotMatch(
+        await invalidSession.text(),
+        /A place for the work ahead|Project management is not implemented|approval inbox is not implemented/,
+      );
       const authorized = await get(path, session());
       assert.equal(authorized.status, 200);
       assert.match(authorized.headers.get('cache-control') ?? '', /no-store/);
