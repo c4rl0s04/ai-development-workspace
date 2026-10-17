@@ -16,7 +16,7 @@ export function PageHeading({
         </p>
       </div>
       <span className="rounded-md border border-line bg-white px-3 py-1.5 text-xs font-medium text-muted">
-        M0 · Foundation
+        M1 · Workspace
       </span>
     </header>
   );

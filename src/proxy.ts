@@ -38,7 +38,10 @@ export async function proxy(request: NextRequest) {
     return auth.finish(NextResponse.next({ request }));
   } catch (error) {
     if (error instanceof AccessError && error.reason !== 'unavailable') {
-      if (['GET', 'HEAD'].includes(request.method)) {
+      if (
+        ['GET', 'HEAD'].includes(request.method) &&
+        !request.nextUrl.pathname.startsWith('/api/')
+      ) {
         const reason = error.reason === 'forbidden' ? 'denied' : 'expired';
         return auth.finish(
           NextResponse.redirect(`${settings.appOrigin}/login?error=${reason}`),
@@ -59,5 +62,10 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/', '/projects/:path*', '/approvals/:path*'],
+  matcher: [
+    '/',
+    '/projects/:path*',
+    '/approvals/:path*',
+    '/api/projects/:path*',
+  ],
 };

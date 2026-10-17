@@ -33,7 +33,12 @@ export function Navigation() {
         <Link
           key={href}
           href={href}
-          aria-current={pathname === href ? 'page' : undefined}
+          aria-current={
+            pathname === href ||
+            (href !== '/' && pathname.startsWith(`${href}/`))
+              ? 'page'
+              : undefined
+          }
           className="nav-link flex min-h-12 flex-1 items-center justify-center gap-3 rounded-lg px-3 py-3 text-sm font-medium lg:flex-none lg:justify-start lg:px-4"
         >
           <svg

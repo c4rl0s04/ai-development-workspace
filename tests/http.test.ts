@@ -91,6 +91,7 @@ async function startApp(authOrigin?: string) {
         SUPABASE_URL: authOrigin ?? '',
         SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_mock',
         OWNER_GITHUB_ID: owner,
+        DATABASE_URL: '',
       },
       stdio: 'ignore',
     },
@@ -246,6 +247,8 @@ test('built app enforces real SSR cookie boundaries with a local mock Auth serve
         /frame-ancestors 'none'/,
       );
       const html = await authorized.text();
+      if (path === '/projects')
+        assert.match(html, /Storage is temporarily unavailable/);
       assert.match(html, /Skip to content/);
       assert.match(html, /<main id="main-content"/);
       assert.match(
@@ -317,6 +320,14 @@ test('built app enforces real SSR cookie boundaries with a local mock Auth serve
     assert.equal(
       (await post('/projects', app.origin, session(token('2')))).status,
       403,
+    );
+    assert.equal((await get('/api/projects')).status, 401);
+    assert.equal((await get('/api/projects', session(token('2')))).status, 403);
+    const unavailableStorage = await get('/api/projects', session());
+    assert.equal(unavailableStorage.status, 503);
+    assert.doesNotMatch(
+      await unavailableStorage.text(),
+      /postgresql:|DATABASE_URL|password/i,
     );
     const login = await post('/auth/login', app.origin);
     assert.equal(login.status, 303);
