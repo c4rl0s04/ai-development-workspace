@@ -17,6 +17,16 @@ Independent Next.js/TypeScript proof of concept for [specification v0.2](../../d
 
 The original Git branch incorrectly used `z.uuid()` for Supabase's **opaque** OAuth `authorization_id`; this caused `Missing or invalid authorization request`. It was fixed during the live test and is now committed in `lib/oauth.ts` with regression coverage in `tests/oauth.test.ts`. Do not confuse this ID with Supabase's UUID-shaped **OAuth client ID**.
 
+### Local verification and deployment diagnosis — 2026-10-17
+
+At commit `e667953`, using Node `v24.21.0` and npm `11.19.0`, `npm ci --ignore-scripts`, `npm run typecheck`, `npm test` (12 passed), `npm run build`, and `npm run test:http` (1 passed) all succeeded. Tests required permission for local IPC/loopback listeners outside the execution sandbox. The HTTP test uses an ephemeral mock issuer; these results do not add live Supabase/Codex security evidence.
+
+Git-triggered Preview builds for `d92286d`, `d1de340`, and `e667953` failed because Vercel project `ai-development-workspace` had an unset Root Directory (`.`), so Next.js ran at the repository root. With owner approval, only Root Directory (`spikes/remote-mcp`), Install Command (`npm ci --ignore-scripts`), and Build Command (`npm run build`) were corrected. Next.js, Node `24.x`, default output, Git integration and Production branch `main` were retained.
+
+One separately authorized [Preview redeployment of `e667953`](https://vercel.com/carlosandreshuete-1394s-projects/ai-development-workspace/HY8E7335uWuXtChH7tbXeExkMZhU) reached **READY**. Full build logs confirmed installation, TypeScript, compilation, route generation and deployment succeeded; the only warning concerned npm's `cache-dir` environment configuration. The exact cloud npm version was not recorded. The Production alias remained on the existing `READY` deployment; no environment variables, OAuth, Supabase, domains or deployment protection were changed.
+
+The six app variables target **Production only**. Preview authentication was not tested and is not established by the successful build. Configuring Preview OAuth would require separate approval and matching origin/audience/callback settings. Remaining live security checks are listed in the validation record and adoption checklist below; the exact tested Codex client version was not recorded.
+
 ## Compatibility risks and design
 
 - Supabase OAuth Server remains beta. Its documented access-token audience defaults to `authenticated`; this endpoint rejects that audience. The manual Auth hook sets `aud` to the exact canonical `/api/mcp` URL only for the configured OAuth client, derives `github_provider_id` from `auth.identities`, and caps access tokens at five minutes. It must be tested for both code exchange and refresh. No user-editable metadata establishes owner access.
