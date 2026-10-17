@@ -1,9 +1,17 @@
 import type { NextConfig } from 'next';
+import { parseAuthConfig } from './src/infrastructure/auth/config';
 
 const config: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
   async headers() {
+    let formAction = "'self'";
+    try {
+      // Chromium also checks redirects following a form POST during OAuth.
+      formAction += ` ${parseAuthConfig(process.env).supabaseUrl} https://github.com`;
+    } catch {
+      // Unconfigured deployments retain same-origin forms and fail closed.
+    }
     return [
       {
         source: '/:path*',
@@ -17,8 +25,7 @@ const config: NextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value:
-              "frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action 'self'",
+            value: `frame-ancestors 'none'; base-uri 'self'; object-src 'none'; form-action ${formAction}`,
           },
         ],
       },

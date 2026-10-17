@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { renderToStaticMarkup } from 'react-dom/server';
-import Overview from '../src/app/page';
-import Projects from '../src/app/projects/page';
-import Approvals from '../src/app/approvals/page';
+import Overview from '../src/app/(workspace)/page';
+import Projects from '../src/app/(workspace)/projects/page';
+import Approvals from '../src/app/(workspace)/approvals/page';
 import NotFound from '../src/app/not-found';
 
 test('overview provides real navigation and clearly states the foundation boundary', () => {
