@@ -112,3 +112,34 @@ test('configuration fails closed, allows HTTP only on loopback and rejects privi
   ])
     assert.throws(() => parseAuthConfig({ ...env, ...override }));
 });
+
+test('OAuth form policy permits only the configured provider redirect chain', async () => {
+  const { default: config } = await import('../next.config');
+  const saved = { ...process.env };
+  try {
+    Object.assign(process.env, {
+      APP_URL: 'http://127.0.0.1:3000',
+      SUPABASE_URL: 'https://auth.example',
+      SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_test',
+      OWNER_GITHUB_ID: owner,
+    });
+    const policies = await config.headers?.();
+    const policy = policies?.[0].headers.find(
+      (h) => h.key === 'Content-Security-Policy',
+    )?.value;
+    assert.ok(
+      policy?.endsWith(
+        "form-action 'self' https://auth.example https://github.com",
+      ),
+    );
+    process.env.SUPABASE_URL = 'https://auth.example/path';
+    const closed = await config.headers?.();
+    assert.ok(
+      closed?.[0].headers
+        .find((h) => h.key === 'Content-Security-Policy')
+        ?.value.endsWith("form-action 'self'"),
+    );
+  } finally {
+    process.env = saved;
+  }
+});

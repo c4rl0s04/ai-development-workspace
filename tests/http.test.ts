@@ -228,6 +228,7 @@ test('built app enforces real SSR cookie boundaries with a local mock Auth serve
       assert.match(authorized.headers.get('cache-control') ?? '', /no-store/);
       assert.equal(authorized.headers.get('x-content-type-options'), 'nosniff');
       assert.equal(authorized.headers.get('x-frame-options'), 'DENY');
+      assert.equal(authorized.headers.get('referrer-policy'), 'same-origin');
       assert.equal(authorized.headers.get('x-powered-by'), null);
       assert.match(
         authorized.headers.get('content-security-policy') ?? '',
