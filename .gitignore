@@ -1,0 +1,15 @@
+node_modules/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+.env*
+!.env.example
+.vercel/
+.codex/
+.auth/
+playwright/.auth/
+*.pem
+*.key
+*.log
+.DS_Store
