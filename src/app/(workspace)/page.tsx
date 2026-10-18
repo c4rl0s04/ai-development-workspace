@@ -6,7 +6,7 @@ export default function Overview() {
     <>
       <PageHeading
         title="A place for the work ahead."
-        description="Bring projects, specifications and human decisions into one considered workflow. This is the application foundation; project management is not implemented yet."
+        description="Bring projects, specifications and human decisions into one considered workflow. Projects and tasks now persist in PostgreSQL; workflow transitions and approvals are still in development."
       />
       <section
         aria-labelledby="workspace-title"
@@ -17,7 +17,8 @@ export default function Overview() {
             Your workspace, taking shape
           </h2>
           <p className="mt-2 text-sm leading-6 text-muted">
-            Explore the shell. These pages show where future work will live.
+            Manage projects and capture tasks. Approvals are a preview of future
+            work.
           </p>
         </div>
         <Link
@@ -58,9 +59,10 @@ export default function Overview() {
         </h2>
         <div>
           <p className="max-w-2xl text-sm leading-7 text-muted">
-            Owner sign-in protects this workspace. Persistent projects, task
-            workflows and versioned approvals are next in M1. MCP planning
-            follows in M2. No project data or agent connections are active yet.
+            Owner sign-in protects this workspace. Persistent projects and tasks
+            are available. Workflow transitions and versioned approvals follow
+            in M1. MCP planning follows in M2. No agent connections are active
+            yet.
           </p>
           <p className="mt-4 text-sm font-medium">
             Human approval and execution authorization will remain separate

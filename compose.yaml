@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:17.7-alpine
+    environment:
+      POSTGRES_USER: workspace_migrator
+      POSTGRES_PASSWORD: local-only-not-a-secret
+      POSTGRES_DB: workspace_local
+    ports:
+      - '127.0.0.1:55432:5432'
+    volumes:
+      - m12-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U workspace_migrator -d workspace_local']
+      interval: 2s
+      timeout: 3s
+      retries: 20
+volumes:
+  m12-postgres:
