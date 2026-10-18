@@ -1,3 +1,4 @@
+import { Breadcrumbs } from '@/components/workspace-records';
 import type { Metadata } from 'next';
 import { workspace } from '@/server/workspace';
 import { pageError } from '@/server/page-error';
@@ -20,6 +21,17 @@ export default async function EditTask({
   const { project, task } = result;
   return (
     <>
+      <Breadcrumbs
+        items={[
+          { label: 'Projects', href: '/projects' },
+          { label: project.key, href: `/projects/${project.id}` },
+          {
+            label: taskKey(project, task),
+            href: `/projects/${project.id}/tasks/${task.id}`,
+          },
+          { label: 'Edit' },
+        ]}
+      />
       <PageHeading
         title={`Edit ${taskKey(project, task)}`}
         description="Update task details without changing its workflow state."

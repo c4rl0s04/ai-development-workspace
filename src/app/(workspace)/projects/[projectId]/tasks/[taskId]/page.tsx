@@ -4,7 +4,17 @@ import { workspace } from '@/server/workspace';
 import { pageError } from '@/server/page-error';
 import { taskKey, statusLabels } from '@/domain/workspace';
 import { PageHeading } from '@/components/page-heading';
-import { actionClass, RecordPanel } from '@/components/workspace-records';
+import {
+  actionClass,
+  Breadcrumbs,
+  RecordPanel,
+} from '@/components/workspace-records';
+const dateLabel = (date: Date) =>
+  new Intl.DateTimeFormat('en', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'UTC',
+  }).format(date);
 export const metadata: Metadata = { title: 'Task' };
 export default async function TaskPage({
   params,
@@ -22,27 +32,37 @@ export default async function TaskPage({
   const href = `/projects/${project.id}/tasks/${task.id}`;
   return (
     <>
-      <Link
-        href={`/projects/${project.id}`}
-        className="mb-6 inline-flex min-h-11 items-center text-sm underline"
-      >
-        Back to {project.key}
-      </Link>
+      <Breadcrumbs
+        items={[
+          { label: 'Projects', href: '/projects' },
+          { label: project.key, href: `/projects/${project.id}` },
+          { label: taskKey(project, task) },
+        ]}
+      />
       <PageHeading
         title={task.title}
-        description={`${taskKey(project, task)} · ${statusLabels[task.status]} · Revision ${task.revision}`}
+        description={`${taskKey(project, task)} · ${statusLabels[task.status]}`}
+        actions={
+          <Link href={`${href}/edit`} className={actionClass}>
+            Edit task
+          </Link>
+        }
       />
-      <Link href={`${href}/edit`} className={`${actionClass} mb-8`}>
-        Edit task
-      </Link>
       <RecordPanel>
         <h2 className="text-lg font-semibold">Description</h2>
         <p className="mt-4 whitespace-pre-wrap break-words leading-7 text-muted">
           {task.description || 'No description yet.'}
         </p>
         <p className="mt-8 text-sm text-muted">
-          Created {task.createdAt.toISOString()} · Updated{' '}
-          {task.updatedAt.toISOString()}
+          Created{' '}
+          <time dateTime={task.createdAt.toISOString()}>
+            {dateLabel(task.createdAt)}
+          </time>{' '}
+          · Updated{' '}
+          <time dateTime={task.updatedAt.toISOString()}>
+            {dateLabel(task.updatedAt)}
+          </time>{' '}
+          (UTC)
         </p>
       </RecordPanel>
       <p className="mt-6 text-sm text-muted">

@@ -25,30 +25,30 @@ export default async function Projects({
   }
   return (
     <>
-      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
-        <PageHeading
-          title="Projects"
-          description="Your projects, their repositories and the work ahead."
-        />
-        <Link href="/projects/new" className={actionClass}>
-          New project
-        </Link>
-      </div>
+      <PageHeading
+        title="Projects"
+        description="Projects, repositories and tasks."
+        actions={
+          <Link href="/projects/new" className={actionClass}>
+            New project
+          </Link>
+        }
+      />
       <RecordPanel>
         {result.items.length ? (
           <ul className="divide-y divide-line">
             {result.items.map((project) => (
-              <li key={project.id} className="py-5 first:pt-0 last:pb-0">
+              <li key={project.id} className="py-4 first:pt-0 last:pb-0">
                 <Link
                   href={`/projects/${project.id}`}
-                  className="break-words text-lg font-semibold underline decoration-line hover:decoration-accent"
+                  className="inline-flex min-h-11 items-center break-words font-semibold underline decoration-line hover:decoration-accent"
                 >
                   {project.name}
                 </Link>
                 <span className="ml-3 rounded bg-canvas px-2 py-1 text-xs font-medium">
                   {project.key}
                 </span>
-                <p className="mt-2 line-clamp-2 whitespace-pre-wrap text-sm leading-6 text-muted">
+                <p className="mt-1 line-clamp-2 whitespace-pre-wrap text-sm leading-6 text-muted">
                   {project.description || 'No description yet.'}
                 </p>
                 {project.repositoryUrl ? (

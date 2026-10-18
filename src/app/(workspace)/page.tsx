@@ -5,16 +5,16 @@ export default function Overview() {
   return (
     <>
       <PageHeading
-        title="A place for the work ahead."
-        description="Bring projects, specifications and human decisions into one considered workflow. Projects and tasks now persist in PostgreSQL; workflow transitions and approvals are still in development."
+        title="Overview"
+        description="Projects and tasks now persist in PostgreSQL. Workflow transitions and approvals are not available yet."
       />
       <section
         aria-labelledby="workspace-title"
         className="overflow-hidden rounded-2xl border border-line bg-white"
       >
-        <div className="border-b border-line px-6 py-7 sm:px-8">
+        <div className="border-b border-line px-5 py-4">
           <h2 id="workspace-title" className="text-lg font-semibold">
-            Your workspace, taking shape
+            Continue your work
           </h2>
           <p className="mt-2 text-sm leading-6 text-muted">
             Manage projects and capture tasks. Approvals are a preview of future
@@ -23,7 +23,7 @@ export default function Overview() {
         </div>
         <Link
           href="/projects"
-          className="group flex items-center justify-between gap-5 px-6 py-7 hover:bg-canvas sm:px-8"
+          className="group flex items-center justify-between gap-5 px-5 py-4 hover:bg-canvas"
         >
           <div>
             <h3 className="font-semibold">Projects</h3>
@@ -37,12 +37,12 @@ export default function Overview() {
         </Link>
         <Link
           href="/approvals"
-          className="flex items-center justify-between gap-5 border-t border-line px-6 py-7 hover:bg-canvas sm:px-8"
+          className="flex items-center justify-between gap-5 border-t border-line px-5 py-4 hover:bg-canvas"
         >
           <div>
             <h3 className="font-semibold">Approvals</h3>
             <p className="mt-2 text-sm leading-6 text-muted">
-              A dedicated place for deliberate human decisions.
+              Planned: review decisions. The inbox is not implemented yet.
             </p>
           </div>
           <span className="shrink-0 text-sm font-medium text-accent">
@@ -52,7 +52,7 @@ export default function Overview() {
       </section>
       <section
         aria-labelledby="next-title"
-        className="mt-10 grid gap-5 border-t border-line pt-8 sm:mt-14 sm:grid-cols-[1fr_2fr]"
+        className="mt-6 grid gap-4 border-t border-line pt-5 sm:grid-cols-[1fr_2fr]"
       >
         <h2 id="next-title" className="text-sm font-semibold">
           What comes next

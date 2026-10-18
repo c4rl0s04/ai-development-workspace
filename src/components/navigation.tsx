@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+import Link, { useLinkStatus } from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const destinations = [
@@ -21,6 +21,19 @@ const destinations = [
   },
 ];
 
+function NavigationPending() {
+  const { pending } = useLinkStatus();
+  return (
+    <span role="status" className="absolute top-2 right-2">
+      <span
+        aria-hidden="true"
+        className={`block h-1.5 w-1.5 rounded-full bg-accent ${pending ? 'opacity-100' : 'opacity-0'}`}
+      />
+      <span className="sr-only">{pending ? 'Opening page…' : ''}</span>
+    </span>
+  );
+}
+
 export function Navigation() {
   const pathname = usePathname();
 
@@ -39,7 +52,7 @@ export function Navigation() {
               ? 'page'
               : undefined
           }
-          className="nav-link flex min-h-12 flex-1 items-center justify-center gap-3 rounded-lg px-3 py-3 text-sm font-medium lg:flex-none lg:justify-start lg:px-4"
+          className="nav-link relative flex min-h-12 flex-1 items-center justify-center gap-3 rounded-lg px-3 py-3 text-sm font-medium lg:flex-none lg:justify-start lg:px-4"
         >
           <svg
             width="20"
@@ -56,6 +69,7 @@ export function Navigation() {
             <path d={path} />
           </svg>
           {label}
+          <NavigationPending />
         </Link>
       ))}
     </nav>

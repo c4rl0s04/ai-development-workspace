@@ -6,6 +6,7 @@ import { parse, pageInput, statusLabels, taskKey } from '@/domain/workspace';
 import { PageHeading } from '@/components/page-heading';
 import {
   actionClass,
+  Breadcrumbs,
   RecordPanel,
   Pagination,
 } from '@/components/workspace-records';
@@ -27,49 +28,33 @@ export default async function ProjectPage({ params, searchParams }: Props) {
   const href = `/projects/${project.id}`;
   return (
     <>
-      <Link
-        href="/projects"
-        className="mb-6 inline-flex min-h-11 items-center text-sm underline"
-      >
-        All projects
-      </Link>
+      <Breadcrumbs
+        items={[
+          { label: 'Projects', href: '/projects' },
+          { label: project.key },
+        ]}
+      />
       <PageHeading
         title={project.name}
-        description={`${project.key} · Revision ${project.revision}`}
+        description={project.key}
+        actions={
+          <>
+            <Link href={`${href}/tasks/new`} className={actionClass}>
+              New task
+            </Link>
+            <Link
+              href={`${href}/edit`}
+              className="inline-flex min-h-11 items-center text-sm underline"
+            >
+              Edit project
+            </Link>
+          </>
+        }
       />
-      <div className="mb-8 flex flex-wrap gap-3">
-        <Link href={`${href}/tasks/new`} className={actionClass}>
-          New task
-        </Link>
-        <Link
-          href={`${href}/edit`}
-          className="inline-flex min-h-11 items-center px-3 text-sm underline"
-        >
-          Edit project
-        </Link>
-      </div>
-      <RecordPanel>
-        <h2 className="text-lg font-semibold">About this project</h2>
-        <p className="mt-3 whitespace-pre-wrap break-words leading-7 text-muted">
-          {project.description || 'No description yet.'}
-        </p>
-        {project.repositoryUrl ? (
-          <a
-            href={project.repositoryUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-4 inline-block break-all underline"
-          >
-            {project.repositoryUrl}
-          </a>
-        ) : (
-          <p className="mt-4 text-sm text-muted">
-            No GitHub repository associated.
-          </p>
-        )}
-      </RecordPanel>
-      <section className="mt-10">
-        <h2 className="mb-4 text-xl font-semibold">Tasks</h2>
+      <section aria-labelledby="tasks-title">
+        <h2 id="tasks-title" className="mb-3 text-lg font-semibold">
+          Tasks
+        </h2>
         <RecordPanel>
           {tasks.items.length ? (
             <ul className="divide-y divide-line">
@@ -80,12 +65,12 @@ export default async function ProjectPage({ params, searchParams }: Props) {
                 >
                   <Link
                     href={`${href}/tasks/${task.id}`}
-                    className="min-w-0 break-words underline"
+                    className="inline-flex min-h-11 min-w-0 flex-1 flex-wrap items-center gap-x-3 break-words text-sm font-medium underline decoration-line hover:decoration-accent"
                   >
-                    <span className="mr-3 text-xs font-medium text-muted">
+                    <span className="text-xs font-medium text-muted">
                       {taskKey(project, task)}
                     </span>
-                    {task.title}
+                    <span className="min-w-0 break-words">{task.title}</span>
                   </Link>
                   <span className="rounded bg-canvas px-3 py-1 text-xs font-medium">
                     {statusLabels[task.status]}
@@ -105,6 +90,28 @@ export default async function ProjectPage({ params, searchParams }: Props) {
         </RecordPanel>
         <Pagination page={page} hasMore={tasks.hasMore} href={href} />
       </section>
+      <details className="mt-6 rounded-xl border border-line bg-white p-4 sm:p-5">
+        <summary className="cursor-pointer font-medium">
+          Project details and repository
+        </summary>
+        <p className="mt-3 whitespace-pre-wrap break-words leading-7 text-muted">
+          {project.description || 'No description yet.'}
+        </p>
+        {project.repositoryUrl ? (
+          <a
+            href={project.repositoryUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-block break-all underline"
+          >
+            {project.repositoryUrl}
+          </a>
+        ) : (
+          <p className="mt-4 text-sm text-muted">
+            No GitHub repository associated.
+          </p>
+        )}
+      </details>
     </>
   );
 }
