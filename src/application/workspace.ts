@@ -20,6 +20,7 @@ import {
 // Feature-specific persistence port; every implementation must scope by verified owner.
 export interface WorkspaceStore {
   listProjects(owner: string, page: number): Promise<Page<Project>>;
+  getProjectSummary(owner: string, id: string): Promise<Project>;
   getProject(owner: string, id: string, page: number): Promise<ProjectDetails>;
   createProject(owner: string, input: ProjectInput): Promise<Project>;
   editProject(owner: string, id: string, input: ProjectEdit): Promise<Project>;
@@ -50,6 +51,13 @@ export function workspaceService(
       return store().listProjects(
         owner.githubProviderId,
         parse(pageInput, page),
+      );
+    },
+    async getProjectSummary(id: unknown) {
+      const owner = await auth.requireOwner();
+      return store().getProjectSummary(
+        owner.githubProviderId,
+        parse(opaqueId, id),
       );
     },
     async getProject(id: unknown, page: unknown = 1) {

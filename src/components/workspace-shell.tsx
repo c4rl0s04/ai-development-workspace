@@ -8,9 +8,9 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
       <a href="#main-content" className="skip-link">
         Skip to content
       </a>
-      <div className="min-h-dvh lg:grid lg:grid-cols-[248px_1fr]">
-        <aside className="border-b border-line bg-sidebar px-4 py-5 sm:px-6 lg:sticky lg:top-0 lg:flex lg:h-dvh lg:flex-col lg:border-r lg:border-b-0 lg:py-9">
-          <div className="mb-5 flex items-center gap-3 lg:mb-12">
+      <div className="min-h-dvh lg:grid lg:grid-cols-[224px_1fr]">
+        <aside className="border-b border-line bg-sidebar px-4 py-5 sm:px-6 lg:sticky lg:top-0 lg:flex lg:h-dvh lg:flex-col lg:border-r lg:border-b-0 lg:py-6">
+          <div className="mb-5 flex items-center gap-3 lg:mb-8">
             <div
               className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-ink text-white"
               aria-hidden="true"
@@ -34,17 +34,9 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
             </p>
           </div>
           <Navigation />
-          <div className="mt-auto hidden border-t border-line pt-6 lg:block">
-            <p className="text-sm font-medium">Built for deliberate work.</p>
-            <p className="mt-2 text-xs leading-5 text-muted">
-              Specifications first.
-              <br />
-              Human decisions at every gate.
-            </p>
-          </div>
         </aside>
         <div className="min-w-0">
-          <div className="flex min-h-16 flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b border-line px-6 text-xs text-muted sm:px-10 lg:px-14">
+          <div className="flex min-h-14 flex-wrap items-center justify-between gap-x-4 gap-y-1 border-b border-line px-4 text-xs text-muted sm:px-6 lg:px-8">
             <span>Personal workspace</span>
             <form action="/auth/logout" method="post">
               <button
@@ -54,18 +46,11 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
                 Sign out
               </button>
             </form>
-            <span className="flex items-center gap-2">
-              <span
-                className="h-1.5 w-1.5 rounded-full bg-accent"
-                aria-hidden="true"
-              />
-              Foundation preview
-            </span>
           </div>
           <main
             id="main-content"
             tabIndex={-1}
-            className="mx-auto w-full max-w-7xl px-6 py-10 sm:px-10 sm:py-14 lg:px-14"
+            className="mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8"
           >
             {children}
           </main>

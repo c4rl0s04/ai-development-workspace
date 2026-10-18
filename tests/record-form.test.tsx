@@ -173,6 +173,69 @@ test('record form recovery preserves input and prevents unsafe retries', async (
         },
       );
     }
+    await t.test(
+      'saving locks fields, blocks duplicate submits and focuses errors',
+      async () => {
+        await mount();
+        let complete!: (response: Response) => void;
+        let calls = 0;
+        globalThis.fetch = () => {
+          calls++;
+          return new Promise<Response>((resolve) => {
+            complete = resolve;
+          });
+        };
+        await act(async () => {
+          const form = container.querySelector('form');
+          for (let i = 0; i < 2; i++)
+            form?.dispatchEvent(
+              new dom.window.Event('submit', {
+                bubbles: true,
+                cancelable: true,
+              }),
+            );
+        });
+        assert.equal(container.querySelector('fieldset')?.disabled, true);
+        assert.equal(
+          container.querySelector('form')?.getAttribute('aria-busy'),
+          'true',
+        );
+        assert.equal(save().disabled, true);
+        assert.equal(
+          container.querySelector('a[aria-disabled=true]')?.textContent?.trim(),
+          'Cancel',
+        );
+        await submit();
+        assert.equal(calls, 1);
+        await act(async () =>
+          complete(
+            Response.json(
+              {
+                error: {
+                  code: 'invalid',
+                  message: 'Check the name.',
+                  fields: { name: ['A name is required.'] },
+                },
+              },
+              { status: 400 },
+            ),
+          ),
+        );
+        assert.equal(container.querySelector('fieldset')?.disabled, false);
+        assert.equal(
+          document.activeElement,
+          container.querySelector('[role=alert]'),
+        );
+        assert.equal(
+          container.querySelector('[name=name]')?.getAttribute('aria-invalid'),
+          'true',
+        );
+        assert.equal(
+          (container.querySelector('[name=name]') as HTMLInputElement).value,
+          'Retained name',
+        );
+      },
+    );
     await t.test('stale edit remains locked', async () => {
       await mount({ name: 'Old', description: '', revision: 1 });
       let calls = 0;

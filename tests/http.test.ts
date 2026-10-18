@@ -123,6 +123,7 @@ test('built app enforces real SSR cookie boundaries with a local mock Auth serve
 }, async () => {
   let outage = false;
   let logoutCalls = 0;
+  let identityCalls = 0;
   let challenge = '';
   const consumedCodes = new Set<string>();
   const issuer = createServer(async (request, response) => {
@@ -175,6 +176,7 @@ test('built app enforces real SSR cookie boundaries with a local mock Auth serve
       return;
     }
     if (request.url === '/auth/v1/user') {
+      identityCalls++;
       const bearer =
         request.headers.authorization?.replace('Bearer ', '') ?? '';
       try {
@@ -267,6 +269,20 @@ test('built app enforces real SSR cookie boundaries with a local mock Auth serve
       assert.match(
         (await get(path, session(token('2')))).headers.get('location') ?? '',
         /error=denied$/,
+      );
+    }
+    // Proxy remains independent; layout + service share only this render's identity.
+    for (const path of ['/projects', '/projects/new']) {
+      const before = identityCalls;
+      const response = await get(path, session());
+      await response.text();
+      assert.equal(response.status, 200);
+      assert.equal(identityCalls - before, 4, path);
+      const rejected = await get(path, session(token('2')));
+      assert.equal(
+        rejected.status,
+        307,
+        'a prior render cannot authorize another owner',
       );
     }
     assert.match(

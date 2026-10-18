@@ -97,6 +97,7 @@ test('every workspace operation independently authorizes before reaching persist
     for (const operation of [
       () => service.listProjects(),
       () => service.getProject('invalid'),
+      () => service.getProjectSummary('invalid'),
       () => service.getTask('invalid', 'invalid'),
       () => service.createProject(request, {}),
       () => service.editProject(request, 'invalid', {}),
@@ -115,6 +116,7 @@ test('services pass only verified owner identity; client owner/status overrides 
   };
   const store: WorkspaceStore = {
     getProject: unexpected,
+    getProjectSummary: unexpected,
     createProject: unexpected,
     editProject: unexpected,
     getTask: unexpected,

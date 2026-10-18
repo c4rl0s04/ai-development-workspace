@@ -1,5 +1,11 @@
 'use client';
-import { useState, type FormEvent } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  useTransition,
+  type FormEvent,
+} from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -17,16 +23,24 @@ type Props = {
 };
 export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
   const router = useRouter();
+  const alertRef = useRef<HTMLDivElement>(null);
+  const inFlight = useRef(false);
+  const [navigating, startNavigation] = useTransition();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
   const [fields, setFields] = useState<Record<string, string[]>>({});
   const [conflict, setConflict] = useState(false);
   const [uncertain, setUncertain] = useState(false);
   const [checked, setChecked] = useState(false);
+  useEffect(() => {
+    if (error) alertRef.current?.focus();
+  }, [error]);
+  const busy = pending || navigating;
   const titleField = kind === 'project' ? 'name' : 'title';
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (pending || conflict || uncertain) return;
+    if (inFlight.current || busy || conflict || uncertain) return;
+    inFlight.current = true;
     const form = new FormData(event.currentTarget);
     const input: Record<string, unknown> = Object.fromEntries(form);
     if (initial) input.revision = initial.revision;
@@ -57,19 +71,23 @@ export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
         !data.location.startsWith('/projects/')
       )
         throw new Error('Unconfirmed save');
-      router.push(data.location);
-      router.refresh();
+      startNavigation(() => {
+        router.push(data.location);
+        // Keep the destination fresh when previously visited or prefetched.
+        router.refresh();
+      });
     } catch {
       if (!initial) setUncertain(true);
       setError(
         'The save could not be confirmed. Your input is still here; reload the record before retrying.',
       );
     } finally {
+      inFlight.current = false;
       setPending(false);
     }
   }
   const fieldClass =
-    'mt-2 block w-full rounded-lg border border-line bg-white px-3 py-2.5 text-ink';
+    'mt-2 block w-full rounded-lg border border-control bg-white px-3 py-2.5 text-ink';
   function errors(key: string) {
     return fields[key]?.length ? (
       <p id={`${key}-error`} className="mt-2 text-sm text-red-800">
@@ -78,9 +96,11 @@ export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
     ) : null;
   }
   return (
-    <form onSubmit={submit} className="max-w-2xl space-y-6" aria-busy={pending}>
+    <form onSubmit={submit} className="max-w-2xl space-y-6" aria-busy={busy}>
       {error ? (
         <div
+          ref={alertRef}
+          tabIndex={-1}
           role="alert"
           className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-900"
         >
@@ -131,116 +151,122 @@ export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
           </button>
         </section>
       ) : null}
-      <div>
-        <label htmlFor={titleField} className="font-medium">
-          {kind === 'project' ? 'Project name' : 'Task title'}
-        </label>
-        <input
-          id={titleField}
-          name={titleField}
-          required
-          maxLength={kind === 'project' ? 100 : 200}
-          defaultValue={initial?.name ?? initial?.title ?? ''}
-          className={fieldClass}
-          aria-invalid={!!fields[titleField]}
-          aria-describedby={
-            fields[titleField] ? `${titleField}-error` : undefined
-          }
-        />
-        {errors(titleField)}
-      </div>
-      {kind === 'project' && !initial ? (
+      <fieldset disabled={busy} className="min-w-0 space-y-5">
         <div>
-          <label htmlFor="key" className="font-medium">
-            Project key
+          <label htmlFor={titleField} className="font-medium">
+            {kind === 'project' ? 'Project name' : 'Task title'}
           </label>
           <input
-            id="key"
-            name="key"
+            id={titleField}
+            name={titleField}
             required
-            pattern="[A-Za-z][A-Za-z0-9]{1,9}"
-            minLength={2}
-            maxLength={10}
-            placeholder="ELS"
+            maxLength={kind === 'project' ? 100 : 200}
+            defaultValue={initial?.name ?? initial?.title ?? ''}
             className={fieldClass}
-            aria-invalid={!!fields.key}
-            aria-describedby={fields.key ? 'key-hint key-error' : 'key-hint'}
-          />
-          <p id="key-hint" className="mt-2 text-sm text-muted">
-            2–10 letters or digits. The key cannot change; task identifiers will
-            use it, for example ELS-1.
-          </p>
-          {errors('key')}
-        </div>
-      ) : null}
-      <div>
-        <label htmlFor="description" className="font-medium">
-          Description {kind === 'project' ? '(optional)' : ''}
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          rows={6}
-          maxLength={10000}
-          defaultValue={initial?.description ?? ''}
-          className={fieldClass}
-          aria-invalid={!!fields.description}
-          aria-describedby={
-            fields.description ? 'description-error' : undefined
-          }
-        />
-        {errors('description')}
-      </div>
-      {kind === 'project' ? (
-        <div>
-          <label htmlFor="repositoryUrl" className="font-medium">
-            GitHub repository URL (optional)
-          </label>
-          <input
-            id="repositoryUrl"
-            name="repositoryUrl"
-            type="url"
-            maxLength={300}
-            placeholder="https://github.com/owner/repository"
-            defaultValue={initial?.repositoryUrl ?? ''}
-            className={fieldClass}
-            aria-invalid={!!fields.repositoryUrl}
+            aria-invalid={!!fields[titleField]}
             aria-describedby={
-              fields.repositoryUrl
-                ? 'repository-hint repositoryUrl-error'
-                : 'repository-hint'
+              fields[titleField] ? `${titleField}-error` : undefined
             }
           />
-          <p id="repository-hint" className="mt-2 text-sm text-muted">
-            Association only. No repository permissions or GitHub API access are
-            requested. Clear this field to retire the current link.
-          </p>
-          {errors('repositoryUrl')}
+          {errors(titleField)}
         </div>
-      ) : (
-        <p className="text-sm text-muted">
-          New tasks enter Backlog. Status transitions and approvals arrive in
-          later milestones.
-        </p>
-      )}
-      <div className="flex flex-wrap items-center gap-4">
-        <button
-          type="submit"
-          disabled={pending || conflict || uncertain}
-          className="min-h-11 rounded-lg bg-accent px-5 py-2.5 font-medium text-white hover:bg-accent-hover disabled:opacity-60"
-        >
-          {pending ? 'Saving…' : initial ? 'Save changes' : `Create ${kind}`}
-        </button>
-        <Link
-          href={cancelHref}
-          className="inline-flex min-h-11 items-center underline"
-        >
-          Cancel
-        </Link>
-        <span role="status" className="text-sm text-muted">
-          {pending ? 'Saving your changes…' : ''}
-        </span>
-      </div>
+        {kind === 'project' && !initial ? (
+          <div>
+            <label htmlFor="key" className="font-medium">
+              Project key
+            </label>
+            <input
+              id="key"
+              name="key"
+              required
+              pattern="[A-Za-z][A-Za-z0-9]{1,9}"
+              minLength={2}
+              maxLength={10}
+              placeholder="ELS"
+              className={fieldClass}
+              aria-invalid={!!fields.key}
+              aria-describedby={fields.key ? 'key-hint key-error' : 'key-hint'}
+            />
+            <p id="key-hint" className="mt-2 text-sm text-muted">
+              2–10 letters or digits. The key cannot change; task identifiers
+              will use it, for example ELS-1.
+            </p>
+            {errors('key')}
+          </div>
+        ) : null}
+        <div>
+          <label htmlFor="description" className="font-medium">
+            Description (optional)
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            rows={4}
+            maxLength={10000}
+            defaultValue={initial?.description ?? ''}
+            className={fieldClass}
+            aria-invalid={!!fields.description}
+            aria-describedby={
+              fields.description ? 'description-error' : undefined
+            }
+          />
+          {errors('description')}
+        </div>
+        {kind === 'project' ? (
+          <div>
+            <label htmlFor="repositoryUrl" className="font-medium">
+              GitHub repository URL (optional)
+            </label>
+            <input
+              id="repositoryUrl"
+              name="repositoryUrl"
+              type="url"
+              maxLength={300}
+              placeholder="https://github.com/owner/repository"
+              defaultValue={initial?.repositoryUrl ?? ''}
+              className={fieldClass}
+              aria-invalid={!!fields.repositoryUrl}
+              aria-describedby={
+                fields.repositoryUrl
+                  ? 'repository-hint repositoryUrl-error'
+                  : 'repository-hint'
+              }
+            />
+            <p id="repository-hint" className="mt-2 text-sm text-muted">
+              Association only. No repository permissions or GitHub API access
+              are requested. Clear this field to retire the current link.
+            </p>
+            {errors('repositoryUrl')}
+          </div>
+        ) : (
+          <p className="text-sm text-muted">
+            New tasks enter Backlog. Status transitions and approvals arrive in
+            later milestones.
+          </p>
+        )}
+        <div className="flex flex-wrap items-center gap-4">
+          <button
+            type="submit"
+            disabled={busy || conflict || uncertain}
+            className="min-h-11 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-60"
+          >
+            {busy ? 'Saving…' : initial ? 'Save changes' : `Create ${kind}`}
+          </button>
+          <Link
+            href={cancelHref}
+            aria-disabled={busy || undefined}
+            onClick={(event) => {
+              if (busy) event.preventDefault();
+            }}
+            className="inline-flex min-h-11 items-center underline"
+          >
+            Cancel
+          </Link>
+          <span role="status" className="text-sm text-muted">
+            {busy ? 'Saving your changes…' : ''}
+          </span>
+        </div>
+      </fieldset>
     </form>
   );
 }
