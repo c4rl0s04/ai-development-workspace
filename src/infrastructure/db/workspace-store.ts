@@ -78,18 +78,20 @@ export function postgresWorkspaceStore(db: Database): WorkspaceStore {
     );
   async function project(tx: Tx, owner: string, id: string): Promise<Project> {
     const [row] = await tx
-      .select()
+      .select({ project: projects, repositoryUrl: repositories.url })
       .from(projects)
+      .leftJoin(
+        repositories,
+        and(
+          eq(repositories.projectId, projects.id),
+          isNull(repositories.retiredAt),
+        ),
+      )
       .where(and(eq(projects.id, id), owned(owner)));
     if (!row) throw notFound();
-    const [repo] = await tx
-      .select()
-      .from(repositories)
-      .where(
-        and(eq(repositories.projectId, id), isNull(repositories.retiredAt)),
-      );
-    return projectRecord(row, repo?.url ?? null);
+    return projectRecord(row.project, row.repositoryUrl);
   }
+
   async function repository(tx: Tx, projectId: string, url: string | null) {
     const [current] = await tx
       .select()
@@ -132,6 +134,8 @@ export function postgresWorkspaceStore(db: Database): WorkspaceStore {
           hasMore: rows.length > pageSize,
         };
       }),
+    getProjectSummary: (owner, id) =>
+      scoped(owner, (tx) => project(tx, owner, id)),
     getProject: (owner, id, page) =>
       scoped(owner, async (tx) => {
         const found = await project(tx, owner, id);

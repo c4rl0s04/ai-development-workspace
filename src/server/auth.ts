@@ -1,4 +1,5 @@
 import 'server-only';
+import { cache } from 'react';
 import { cookies } from 'next/headers';
 import {
   authorizeOwner,
@@ -34,9 +35,12 @@ async function identityReader(writable = false) {
   return () => readVerifiedIdentity(client);
 }
 
+// Request-scoped render memo; Proxy and writable mutation checks stay independent.
+const renderIdentity = cache(async () => (await identityReader())());
+
 // No caller-provided identity, headers, tokens or owner IDs can establish authority.
 export async function requireOwner() {
-  return authorizeOwner(await identityReader(), authConfig().ownerGithubId);
+  return authorizeOwner(renderIdentity, authConfig().ownerGithubId);
 }
 
 export async function requireOwnerMutation(request: Request) {

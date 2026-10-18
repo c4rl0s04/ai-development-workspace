@@ -97,6 +97,35 @@ test('real PostgreSQL: migrations, constraints, RLS, concurrent writes, rollback
         );
       },
     );
+    await t.test(
+      'focused reads retain owner scope and avoid unnecessary task queries',
+      async () => {
+        const statements: string[] = [];
+        runtime.client.options.debug = (_connection, query) => {
+          statements.push(query);
+        };
+        try {
+          assert.equal(
+            (await service.getProjectSummary(first.id)).repositoryUrl,
+            'https://github.com/owner/repo',
+          );
+          assert.equal(statements.length, 5);
+          assert.ok(
+            !statements.some((query) => query.includes('"workspace"."tasks"')),
+          );
+          statements.length = 0;
+          await service.getProject(first.id);
+          assert.equal(statements.length, 6);
+          await assert.rejects(
+            () => store.getProjectSummary('2', first.id),
+            (error: unknown) =>
+              error instanceof WorkspaceError && error.code === 'not_found',
+          );
+        } finally {
+          runtime.client.options.debug = false;
+        }
+      },
+    );
     const task = await service.createTask(request, first.id, {
       title: 'First task',
       description: 'Persistent details',
