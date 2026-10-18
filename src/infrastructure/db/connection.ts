@@ -20,7 +20,9 @@ export function connectDatabase(value: string | undefined) {
       max: 4,
       connect_timeout: 3,
       idle_timeout: 20,
-      ssl: local ? false : { rejectUnauthorized: true },
+      ssl: local
+        ? false
+        : { rejectUnauthorized: true, ca: process.env.DATABASE_CA_CERT },
       connection: { statement_timeout: 5000, lock_timeout: 3000 },
       onnotice: () => {},
     });
