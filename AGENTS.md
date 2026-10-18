@@ -50,3 +50,9 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Project keys and task numbers are immutable. Task number allocation and insert share a transaction; revision-checked edits include repository changes atomically. Tasks enter Backlog; no status transitions, permanent deletion, team tables or agent infrastructure in M1.2. Repository replacements retire associations.
 - See [persistence guide](docs/guides/persistence.md) for Docker/local-only migration commands, role setup, environment variables and hosted approval checklist. Add `npm run test:db` (local TEST_DATABASE_URL) after the existing build/HTTP checks. Ordinary `.test.ts` files under tests/unit and PostgreSQL `.test.ts` files under tests/integration are explicitly included in npm/CI. Test databases are randomly named and isolated; never truncate development or hosted data.
 - Do not introduce real private data remotely until Issue #7 live second-account, expiry/revocation and cookie/cache boundaries are reviewed. Report fixture-tested behavior separately from live evidence. M1.3/M1.4 add workflow audit and specification/decision/outbox behavior.
+
+## Frontend foundation
+
+- `requireOwner()` deduplicates verified identity with React `cache` within one Server Component render only; retain every service authorization call. Proxy, HTTP handlers outside React rendering, and writable mutation checks remain independent. Never replace this with a process-wide identity cache.
+- Use `getProjectSummary` for project edit/new-task context; `getProject` includes a paginated task list. Keep role checks, transaction-local owner context, RLS and revision guards intact.
+- Shared page headers accept actions; breadcrumbs and loading markup live in `workspace-records`. Keep forms narrow and workspace views wide. See `DESIGN.md` and [frontend validation](docs/guides/frontend-foundation.md).

@@ -1,7 +1,7 @@
-# Workspace shell
+# Workspace foundation
 
-The M0 interface serves a single owner navigating a development workspace. It uses a restrained light palette, a quiet slate sidebar, blue for navigation/focus and a system sans-serif family. This is an initial shell, not final branding.
+The interface serves a single owner navigating a development workspace. It uses a restrained light palette, a quiet slate sidebar, blue for navigation/focus and a system sans-serif family. Preserve this visual identity as project and task workflows evolve.
 
-Desktop navigation stays in a 248px sidebar; below the desktop breakpoint, the same links remain visible in a horizontal row. Avoid a menu toggle for only three destinations. Content has a bounded reading width, clear headings and generous grouping. Active navigation uses `aria-current`, and a skip link reaches the main landmark.
+Desktop navigation stays in a 224px sidebar; below the desktop breakpoint, the same links remain visible in a horizontal row. Avoid a menu toggle for only three destinations. Workspace content can expand to 1600px for future project views; forms remain bounded to 42rem. Compact headings group primary actions. Tasks precede collapsible project metadata. Breadcrumbs connect projects, tasks and forms. Active navigation uses `aria-current`, and a skip link reaches the main landmark.
 
-Only working route links are interactive. Placeholder content states what is absent and the milestone that introduces it. Do not add synthetic records, fake counters, simulated integrations or disabled creation/approval controls. Preserve contrast, visible keyboard focus and 320px layouts as pages evolve.
+Only working route links are interactive. Placeholder content states what is absent and the milestone that introduces it. Do not add synthetic records, fake counters, simulated integrations or disabled creation/approval controls. Preserve contrast, visible keyboard focus and 320px layouts as pages evolve. Use the control-border token for identifiable input boundaries, quieter line borders for grouping. Loading states reserve a simple content shape without motion; navigation indicates pending links. Saving locks form fields and cancellation until the operation/navigation finishes. Errors receive focus without discarding input.
