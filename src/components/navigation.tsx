@@ -52,7 +52,7 @@ export function Navigation() {
               ? 'page'
               : undefined
           }
-          className="nav-link relative flex min-h-12 flex-1 items-center justify-center gap-3 rounded-lg px-3 py-3 text-sm font-medium lg:flex-none lg:justify-start lg:px-4"
+          className="nav-link flex-1 lg:flex-none"
         >
           <svg
             width="20"
@@ -64,7 +64,7 @@ export function Navigation() {
             strokeLinecap="round"
             strokeLinejoin="round"
             aria-hidden="true"
-            className="hidden sm:block"
+            className="shrink-0"
           >
             <path d={path} />
           </svg>

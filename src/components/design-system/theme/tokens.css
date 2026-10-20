@@ -1,12 +1,6 @@
 /* biome-ignore-all lint/style/noDescendingSpecificity: Component-scoped selectors target separate subtrees; responsive overrides follow their desktop rules. */
-/* Lab-only palette. Also attached to portal roots; never :root or .dark. */
+/* Shared graphite palette on application and portal roots; never registry globals. */
 .workspace-theme {
-  --lab-bg: #111318;
-  --lab-paper: #202329;
-  --lab-text: #edf0f5;
-  --lab-muted: #bac2ce;
-  --lab-line: #ffffff12;
-  --lab-accent: #c5d4eb;
   --lq-text: #edf0f5;
   --lq-text-dim: #a8b2c2;
   --lq-tint: rgb(78 89 107 / 52%);
@@ -98,9 +92,6 @@
   --ws-duration-fast: 120ms;
   --ws-duration-normal: 180ms;
   --ws-ease: cubic-bezier(0.23, 1, 0.32, 1);
-  --lab-text: var(--ws-text);
-  --lab-muted: var(--ws-text-muted);
-  --lab-line: var(--ws-border);
   --lq-text: var(--ws-text);
   --lq-text-dim: var(--ws-text-secondary);
   --lq-control-rim: var(--ws-border-control);

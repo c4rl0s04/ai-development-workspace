@@ -56,3 +56,22 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - `requireOwner()` deduplicates verified identity with React `cache` within one Server Component render only; retain every service authorization call. Proxy, HTTP handlers outside React rendering, and writable mutation checks remain independent. Never replace this with a process-wide identity cache.
 - Use `getProjectSummary` for project edit/new-task context; `getProject` includes a paginated task list. Keep role checks, transaction-local owner context, RLS and revision guards intact.
 - Shared page headers accept actions; breadcrumbs and loading markup live in `workspace-records`. Keep forms narrow and workspace views wide. See `DESIGN.md` and [frontend validation](docs/guides/frontend-foundation.md).
+
+## Production visual foundation (M1.2.2)
+
+- The approved production presentation is graphite/steel Liquid Glass; DESIGN.md
+  and src/components/design-system/theme own tokens/material/control rules. Read
+  docs/design-system/README.md before introducing a component. Reuse Base UI/Liqui,
+  server record adapters and native form recipes; do not add a second framework.
+- Keep server routes and all existing auth/service/DB boundaries. Material chrome
+  is a small client island; actual records remain Server Components. No fixture,
+  design-lab route/helper, conceptual board or demo action belongs in production.
+- Preserve native form locking, validation/focus, duplicate-key correction,
+  revision denial and uncertain-create reconciliation. Use read-only status until
+  M1.3; do not expose arbitrary transitions through a new visual control.
+- Use Impeccable's current launcher/context once per task, preserve the established
+  Operate direction, review rendered desktop/mobile/browser states, then make a
+  bounded correction/confirmation. Verify hook dispatch or run its manual scan;
+  no reinstall is needed. Evidence/limitations live in docs/guides/visual-redesign.md.
+- This feature worktree is based on fresh main. Local commits only are authorized;
+  no push, merge, deployment, database/cloud change or MCP modification is implied.
