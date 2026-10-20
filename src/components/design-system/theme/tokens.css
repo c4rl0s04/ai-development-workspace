@@ -1,0 +1,98 @@
+/* biome-ignore-all lint/style/noDescendingSpecificity: Component-scoped selectors target separate subtrees; responsive overrides follow their desktop rules. */
+/* Shared graphite palette on application and portal roots; never registry globals. */
+.workspace-theme {
+  --lq-text: #edf0f5;
+  --lq-text-dim: #a8b2c2;
+  --lq-tint: rgb(78 89 107 / 52%);
+  --lq-tint-deep: rgb(21 26 35 / 76%);
+  --lq-rim-hi: rgb(226 236 250 / 34%);
+  --lq-rim-lo: rgb(216 230 249 / 9%);
+  --lq-shadow: 0 28px 70px #03060b80, 0 6px 18px #03060b59;
+  --lq-highlight: rgb(211 226 248 / 12%);
+  --lq-control: #ffffff16;
+  --lq-control-rim: #ffffff33;
+  --lq-accent: #526b8b;
+  --lq-danger: #b75d55;
+  --lq-danger-text: #ffc3b9;
+  --lq-scrim: #070a10b8;
+  color: var(--ws-text);
+  color-scheme: dark;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  scrollbar-color: #667184 #191e27;
+}
+.workspace-theme *,
+.workspace-theme *::before,
+.workspace-theme *::after {
+  box-sizing: border-box;
+}
+.workspace-theme ::selection {
+  background: #3e587d;
+  color: #fff;
+}
+.workspace-theme :focus-visible {
+  outline: 2px solid #b7d2ff;
+  outline-offset: 4px;
+}
+.workspace-theme button {
+  cursor: pointer;
+}
+.workspace-theme button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+.workspace-theme svg {
+  flex-shrink: 0;
+  stroke-width: 1.6;
+}
+
+/* Public semantic contract. Colour changes belong here, not in each control. */
+.workspace-theme {
+  --ws-background: #13161c;
+  --ws-surface: #20242c;
+  --ws-surface-raised: #2a303a;
+  --ws-surface-muted: #191e26;
+  --ws-text: #edf0f5;
+  --ws-text-secondary: #c7cfdb;
+  --ws-text-muted: #a7b2c3;
+  --ws-border: #cfddf226;
+  --ws-border-control: #bdcce175;
+  --ws-selected: #b9cfee1c;
+  --ws-hover: #dce7f810;
+  --ws-focus: #b7d2ff;
+  --ws-success: #b4d399;
+  --ws-warning: #e1ce99;
+  --ws-danger: #f4b7aa;
+  --ws-info: #bdcdeb;
+  --ws-status-backlog: #aeb9c8;
+  --ws-status-specification: #c4bfdd;
+  --ws-status-pending-review: #e1bfa9;
+  --ws-status-ready: #bdcdeb;
+  --ws-status-in-progress: #e1ce99;
+  --ws-status-review: #d4b9db;
+  --ws-status-done: #b4d399;
+  --ws-font-small: 0.75rem;
+  --ws-font-body: 0.875rem;
+  --ws-font-title: 1.5rem;
+  --ws-font-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+  --ws-leading: 1.5;
+  --ws-space-1: 0.25rem;
+  --ws-space-2: 0.5rem;
+  --ws-space-3: 0.75rem;
+  --ws-space-4: 1rem;
+  --ws-space-6: 1.5rem;
+  --ws-space-8: 2rem;
+  --ws-radius-control: 0.625rem;
+  --ws-radius-panel: 1.125rem;
+  --ws-radius-chrome: 1.625rem;
+  --ws-shadow-panel: 0 8px 30px #03060b30;
+  --ws-shadow-floating: 0 16px 36px #03060b55;
+  --ws-duration-fast: 120ms;
+  --ws-duration-normal: 180ms;
+  --ws-ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --lq-text: var(--ws-text);
+  --lq-text-dim: var(--ws-text-secondary);
+  --lq-control-rim: var(--ws-border-control);
+}

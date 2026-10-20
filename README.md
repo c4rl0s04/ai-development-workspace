@@ -2,7 +2,7 @@
 
 A workspace for connecting software projects, versioned specifications, human decisions and supervised coding agents.
 
-**M1.2 is merged into main and deployed (owner-confirmed).** Projects and Tasks persist through server-side Drizzle/PostgreSQL, owner authorization, RLS and optimistic revisions. This local M1.2.1 branch refines the frontend and reduces redundant Auth/database reads. Approvals and workflow transitions remain unimplemented. No push, deployment or hosted configuration change is authorized for this milestone. See [persistence setup and rollout](docs/guides/persistence.md) and [Auth validation limits](docs/guides/owner-auth.md).
+**M1.2 is merged into main and deployed (owner-confirmed).** Projects and Tasks persist through server-side Drizzle/PostgreSQL, owner authorization, RLS and optimistic revisions. The frontend includes M1.2.1 read reductions and the M1.2.2 graphite visual foundation. Approvals and workflow transitions remain unimplemented. The visual changes do not establish hosted rollout or live security validation. See [persistence setup and rollout](docs/guides/persistence.md) and [Auth validation limits](docs/guides/owner-auth.md).
 
 ## Run locally
 
@@ -48,7 +48,7 @@ src/
   components/          Shared presentation and navigation
 drizzle/               SQL migrations and metadata
 scripts/               Local-only migration/role setup
-tests/                 Unit, Auth HTTP and real PostgreSQL/HTTP suites
+tests/                 Unit, Auth HTTP, PostgreSQL and browser smoke suites
 .github/workflows/     Local-check parity in GitHub Actions
 docs/architecture/     Versioned technical specifications
 ```
@@ -57,7 +57,7 @@ This is a modular monolith, with an independently hosted runner planned later. A
 
 ## Required workflow and milestone boundary
 
-[Technical specification v0.2](docs/architecture/technical-spec-v0.2.md) remains the architectural baseline. Its documentation-only status describes the original draft, not the current branch; Issue #4 and the completed M1.2 scope establish the persistence slice; M1.2.1 preserves those boundaries. Required workflow/authority rules remain intact; provisional provider choices are not implemented by installing this app.
+[Technical specification v0.2](docs/architecture/technical-spec-v0.2.md) remains the architectural baseline. Its documentation-only status describes the original draft, not the current branch; Issue #4 and the completed M1.2 scope establish the persistence slice; the frontend milestones preserve those boundaries. Required workflow/authority rules remain intact; provisional provider choices are not implemented by installing this app.
 
 The seven task stages will be **Backlog → Specification → Pending review → Ready → In progress → Review → Done**. **On Hold** remains a separate manual condition projected as an extra lane. Dependency guards and explicit transitions must apply through every interface. Human approvals bind to exact revisions; execution grants are separate. Agents cannot approve their own work, authorize execution or bypass acceptance/integration gates.
 
@@ -75,7 +75,7 @@ The authenticated M1.2 dashboard is deployed separately at <https://ai-developme
 
 The existing `ai-development-workspace` Vercel project still serves the OAuth experiment from its last successful deployment at <https://ai-development-workspace-tan.vercel.app>. **Its Git integration was intentionally disconnected before merging M0** to prevent automatic builds from branches that do not include `spikes/remote-mcp`. The production deployment, aliases and authentication configuration were preserved. The MCP project remains an isolated reference and is not the M0 application's deployment target.
 
-The `ai-development-workspace-preview` Vercel project remains connected to the repository and uses `main` as its production branch. A future authorized merge into `main` will deploy the root dashboard **only to the dashboard project**; feature pushes can also trigger Preview builds. Do not push/deploy M1.2.1 or change hosted configuration without separate approval. Do not reconnect or repoint the isolated MCP project; integrating MCP into the real app is separate work for M2.
+The `ai-development-workspace-preview` Vercel project remains connected to the repository and uses `main` as its production branch. A future authorized merge into `main` will deploy the root dashboard **only to the dashboard project**; feature pushes can also trigger Preview builds. Merge, deployment and hosted configuration changes require explicit authorization. Do not reconnect or repoint the isolated MCP project; integrating MCP into the real app is separate work for M2.
 
 See [AGENTS.md](AGENTS.md) for contributor commands and invariants. Changes to persistence and hosted configuration remain subject to human review. The owner chose to reuse the existing Supabase Auth project; the exact setup and real-world checks are in [the auth guide](docs/guides/owner-auth.md).
 
@@ -83,4 +83,16 @@ See [AGENTS.md](AGENTS.md) for contributor commands and invariants. Changes to p
 
 Follow [the local database guide](docs/guides/persistence.md) to start Docker PostgreSQL, apply the two checked migrations and configure the local runtime role. Then run `npm run test:db` with the documented local TEST_DATABASE_URL after the production build. CI runs this integration suite as well as all commands above. The suite verifies RLS with the actual non-owner runtime role, concurrent numbering, stale edits, rollback and persistence across Next.js process restarts. Destructive deletion is deliberately absent.
 
-M1.2.1 local validation (Node 24.21.0 / npm 11.19.0): clean installation, formatting, lint, typecheck and production build passed. **20 unit/render/DOM tests, 2 Auth HTTP scenarios and 11 PostgreSQL TAP tests passed.** RLS, atomic task numbering, revision conflicts, rollback and persistence across process restarts remain covered. Hosted CI and live browser/OAuth were not rerun for this unpushed branch. See [frontend changes, measurements and validation limits](docs/guides/frontend-foundation.md).
+Historical M1.2.1 local validation (Node 24.21.0 / npm 11.19.0): clean installation, formatting, lint, typecheck and production build passed. **20 unit/render/DOM tests, 2 Auth HTTP scenarios and 11 PostgreSQL TAP tests passed.** RLS, atomic task numbering, revision conflicts, rollback and persistence across process restarts remain covered. Hosted CI and live browser/OAuth were not rerun during that local validation. See [frontend changes, measurements and validation limits](docs/guides/frontend-foundation.md).
+
+## Graphite frontend
+
+The application UI uses the approved graphite/steel Liquid Glass foundation:
+frosted navigation/tools with solid server-rendered records and native forms.
+See [DESIGN.md](DESIGN.md), [component reuse](docs/design-system/README.md), and
+[local migration validation](docs/guides/visual-redesign.md). Experimental fixtures,
+design-lab routes and the conceptual Kanban are not part of this application.
+Authentication and persistence behavior remain unchanged. See the
+[browser smoke guide](docs/guides/browser-smoke.md) for `npm run test:browser`
+and the [final stabilization report](docs/reviews/m122-stabilization.md) for
+current test and performance evidence.

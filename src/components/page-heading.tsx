@@ -9,12 +9,12 @@ export function PageHeading({
   actions?: ReactNode;
 }) {
   return (
-    <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
+    <header className="production-page-heading flex flex-wrap items-start justify-between gap-4">
       <div className="min-w-0 max-w-full">
         <h1 className="break-words text-2xl font-semibold tracking-tight sm:text-3xl">
           {title}
         </h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+        <p className="mt-2 max-w-2xl break-words text-sm leading-6 text-muted">
           {description}
         </p>
       </div>

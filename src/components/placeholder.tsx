@@ -12,10 +12,10 @@ export function Placeholder({
   return (
     <section
       aria-labelledby="placeholder-title"
-      className="rounded-2xl border border-line bg-white px-6 py-12 sm:px-10 sm:py-16"
+      className="production-panel production-empty"
     >
       <div
-        className="mb-8 flex h-14 w-14 items-center justify-center rounded-xl bg-canvas text-accent"
+        className="mb-6 flex h-10 w-10 items-center justify-center rounded-xl bg-canvas text-accent"
         aria-hidden="true"
       >
         <svg
@@ -41,7 +41,7 @@ export function Placeholder({
       </p>
       <Link
         href="/"
-        className="mt-8 inline-flex min-h-11 items-center rounded-lg bg-accent px-5 py-2.5 text-sm font-medium text-white hover:bg-accent-hover"
+        className="workspace-button workspace-button--primary mt-8"
       >
         Back to overview
       </Link>
