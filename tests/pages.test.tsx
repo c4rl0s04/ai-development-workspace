@@ -10,6 +10,7 @@ import {
 } from '../src/components/workspace-records';
 import Approvals from '../src/app/(workspace)/approvals/page';
 import NotFound from '../src/app/not-found';
+import WorkspaceNotFound from '../src/app/(workspace)/not-found';
 
 test('loading skeleton material preserves caller-supplied heading and row sizes', () => {
   const css = readFileSync(
@@ -90,6 +91,24 @@ test('approval copy keeps approval and execution authorization distinct', () => 
 
 test('unknown-page component offers a route back into the workspace', () => {
   assert.match(renderToStaticMarkup(<NotFound />), /href="\/"/);
+});
+
+test('workspace missing-record content does not introduce another main or skip target', () => {
+  const html = renderToStaticMarkup(
+    <main id="main-content">
+      <WorkspaceNotFound />
+    </main>,
+  );
+  const dom = new JSDOM(html);
+  try {
+    assert.equal(dom.window.document.querySelectorAll('main').length, 1);
+    assert.equal(
+      dom.window.document.querySelectorAll('#main-content').length,
+      1,
+    );
+  } finally {
+    dom.window.close();
+  }
 });
 
 test('server record presentation keeps status read-only and repository context accessible', async () => {

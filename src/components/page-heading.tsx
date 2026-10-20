@@ -14,7 +14,7 @@ export function PageHeading({
         <h1 className="break-words text-2xl font-semibold tracking-tight sm:text-3xl">
           {title}
         </h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+        <p className="mt-2 max-w-2xl break-words text-sm leading-6 text-muted">
           {description}
         </p>
       </div>

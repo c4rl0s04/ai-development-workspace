@@ -236,7 +236,7 @@
   color: #fff;
 }
 .workspace-button--primary:hover {
-  background: #607d9f;
+  background: #5b7799;
 }
 .workspace-button--secondary {
   background: var(--ws-surface-raised);
@@ -246,7 +246,8 @@
 .workspace-button--secondary:hover {
   background: var(--ws-hover);
 }
-.workspace-button:disabled {
+.workspace-button:disabled,
+.workspace-button[aria-disabled="true"] {
   cursor: not-allowed;
   opacity: 0.5;
 }
