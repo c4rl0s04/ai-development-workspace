@@ -1,0 +1,10 @@
+[
+  {
+    "name": "button",
+    "url": "https://liqui.design/r/button.json",
+    "sourcePath": "registry/liqui/ui/button.tsx",
+    "sourceSha256": "7e7488e33e4b50dfa217f39cc2626a4f72021eeb5f4055c1c5bb10ad27897317",
+    "license": "MIT / Copyright (c) 2026 Fan Li",
+    "localPath": "src/components/design-system/ui/button.tsx"
+  }
+]
