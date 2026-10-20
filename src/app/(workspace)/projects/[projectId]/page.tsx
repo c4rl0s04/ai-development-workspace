@@ -22,7 +22,7 @@ export default async function ProjectPage({ params, searchParams }: Props) {
     page = parse(pageInput, (await searchParams).page ?? 1);
     result = await workspace.getProject((await params).projectId, page);
   } catch (error) {
-    return pageError(error);
+    return pageError(error, 'projects.get');
   }
   const { project, tasks } = result;
   const href = `/projects/${project.id}`;

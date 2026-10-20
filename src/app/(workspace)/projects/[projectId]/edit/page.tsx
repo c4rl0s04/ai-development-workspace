@@ -14,7 +14,7 @@ export default async function EditProject({
   try {
     project = await workspace.getProjectSummary((await params).projectId);
   } catch (error) {
-    return pageError(error);
+    return pageError(error, 'projects.summary');
   }
   return (
     <>

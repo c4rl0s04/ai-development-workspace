@@ -21,7 +21,7 @@ export default async function Projects({
     page = parse(pageInput, (await searchParams).page ?? 1);
     result = await workspace.listProjects(page);
   } catch (error) {
-    return pageError(error);
+    return pageError(error, 'projects.list');
   }
   return (
     <>
