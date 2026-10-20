@@ -414,6 +414,11 @@ test('real PostgreSQL: migrations, constraints, RLS, concurrent writes, rollback
         const badUrl = new URL(runtimeUrl);
         badUrl.port = '1';
         const broken = connectDatabase(badUrl.toString());
+        const events: string[] = [];
+        const original = console.error;
+        console.error = (event: string) => {
+          events.push(event);
+        };
         try {
           await assert.rejects(
             () =>
@@ -421,12 +426,23 @@ test('real PostgreSQL: migrations, constraints, RLS, concurrent writes, rollback
                 title: 'Unavailable',
                 description: '',
               }),
-            (e: unknown) =>
-              e instanceof WorkspaceError &&
-              e.code === 'unavailable' &&
-              !e.message.includes('postgres://'),
+            (e: unknown) => {
+              assert.ok(e instanceof WorkspaceError);
+              assert.equal(e.code, 'unavailable');
+              const reference = reportFailure(e, 'tasks.create');
+              assert.deepEqual(JSON.parse(events[0]), {
+                event: 'server_failure',
+                correlationId: reference,
+                operation: 'tasks.create',
+                category: 'database_connection',
+              });
+              assert.ok(!e.message.includes('postgres://'));
+              return true;
+            },
           );
+          assert.equal(events.length, 1);
         } finally {
+          console.error = original;
           await broken.client.end();
         }
       },

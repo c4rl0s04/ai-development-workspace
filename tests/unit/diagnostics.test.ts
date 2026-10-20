@@ -48,6 +48,7 @@ test('database normalization retains only allowlisted failure classification', (
   };
   const sensitive = [
     'password-sentinel',
+    'postgresql://private-user:password-sentinel@private-host/private-db',
     'Bearer token-sentinel',
     'aw-auth=cookie-sentinel',
     'SELECT payload-sentinel',
