@@ -90,8 +90,6 @@
 .ws-skeleton {
   display: block;
   background: var(--ws-selected);
-  height: 14px;
-  width: 100%;
   border-radius: 5px;
 }
 .ws-empty {
