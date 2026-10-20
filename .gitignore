@@ -9,6 +9,8 @@ coverage/
 .codex/
 .auth/
 playwright/.auth/
+test-results/
+playwright-report/
 *.pem
 *.key
 *.log

@@ -23,7 +23,8 @@
     "db:migrate": "tsx scripts/migrate.ts",
     "db:local-role": "tsx scripts/local-db.ts",
     "db:up": "docker compose -p ai-workspace-m12 up -d --wait",
-    "db:stop": "docker compose -p ai-workspace-m12 stop"
+    "db:stop": "docker compose -p ai-workspace-m12 stop",
+    "test:browser": "playwright test"
   },
   "dependencies": {
     "@base-ui/react": "1.9.0",
@@ -44,6 +45,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
+    "@playwright/test": "1.58.2",
     "@tailwindcss/postcss": "4.3.3",
     "@types/jsdom": "30.0.0",
     "@types/node": "24.19.2",
