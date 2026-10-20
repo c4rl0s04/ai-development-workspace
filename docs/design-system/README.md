@@ -36,13 +36,15 @@ replacement, font service, animation engine or dashboard framework was installed
 ## Reuse and acquisition
 
 Use native links for navigation and the shared action classes for link actions;
-use Button's solid/native variant for submit behavior. Default glass Button is
+use native form controls with the shared recipes for static POST actions, or
+Button's solid/native variant when its interactive behavior is needed. The
+static logout form does not load the client Button factory. Default glass Button is
 not a native submit control. Reuse native form recipes and existing RecordForm
 state/validation before adding fields. Never replace uncertain acknowledgement,
 revision conflicts or busy locks with optimistic visual feedback.
 
 Acquire another Base UI-compatible registry component only when a real feature
-needs it. Review source/dependencies/license/style diff, preserve the scoped theme
+needs it. Review source/dependencies/license/style diff and keyboard/contrast of used variants; preserve the scoped theme
 and helper, pin versions and record source hash/attribution. Do not copy the full
 spike or duplicate an existing control.
 

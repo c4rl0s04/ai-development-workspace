@@ -5,7 +5,6 @@ import {
   ChromeSurface,
   WorkspaceMaterials,
 } from './design-system/materials/chrome';
-import { Button } from './design-system/ui/button';
 
 export function WorkspaceShell({ children }: { children: ReactNode }) {
   return (
@@ -43,15 +42,12 @@ export function WorkspaceShell({ children }: { children: ReactNode }) {
           >
             <span>Workspace</span>
             <form action="/auth/logout" method="post">
-              <Button
-                variant="accent"
-                size="sm"
+              <button
                 type="submit"
-                glass={{ radius: 10 }}
                 className="workspace-button workspace-button--secondary"
               >
                 Sign out
-              </Button>
+              </button>
             </form>
           </ChromeSurface>
           <main id="main-content" tabIndex={-1} className="application-content">
