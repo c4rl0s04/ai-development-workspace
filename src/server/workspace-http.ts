@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { AccessError } from '../application/auth/owner';
 import { WorkspaceError } from '../domain/workspace';
 import { privateResponse } from '../infrastructure/auth/supabase';
+import { reportFailure, type Operation } from '../infrastructure/diagnostics';
 
 export async function readInput(request: Request) {
   if (request.headers.get('content-type')?.split(';')[0] !== 'application/json')
@@ -31,12 +32,22 @@ export async function readInput(request: Request) {
     reader.releaseLock();
   }
 }
-export async function respond(work: () => Promise<unknown>, status = 200) {
+export async function respond(
+  operation: Operation,
+  work: () => Promise<unknown>,
+  status = 200,
+) {
   try {
     return privateResponse(NextResponse.json(await work(), { status }));
   } catch (error) {
+    const correlationId = reportFailure(error, operation);
+    const failureResponse = (response: NextResponse) => {
+      if (correlationId)
+        response.headers.set('X-Correlation-ID', correlationId);
+      return privateResponse(response);
+    };
     if (error instanceof AccessError)
-      return privateResponse(
+      return failureResponse(
         NextResponse.json(
           { error: { message: 'Access denied.' } },
           {
@@ -50,7 +61,7 @@ export async function respond(work: () => Promise<unknown>, status = 200) {
         ),
       );
     if (error instanceof WorkspaceError)
-      return privateResponse(
+      return failureResponse(
         NextResponse.json(
           {
             error: {
@@ -70,7 +81,7 @@ export async function respond(work: () => Promise<unknown>, status = 200) {
           },
         ),
       );
-    return privateResponse(
+    return failureResponse(
       NextResponse.json(
         { error: { message: 'The request could not be completed.' } },
         { status: 503 },

@@ -16,7 +16,7 @@ export default async function EditTask({
     const p = await params;
     result = await workspace.getTask(p.projectId, p.taskId);
   } catch (error) {
-    return pageError(error);
+    return pageError(error, 'tasks.get');
   }
   const { project, task } = result;
   return (

@@ -10,6 +10,7 @@
 
 - Preserve the modular monolith and separate runner boundary. Keep workflow and authorization in application services shared by web and MCP; agents never access the database directly.
 - Use explicit TypeScript contracts and boundary validation for service, MCP, runner, and provider interactions. Keep modules understandable and independently testable; prioritize tests of transition permissions, stale approvals, concurrency, retries, and external failures.
+- Report unexpected workspace failures only at the final HTTP/page boundary using the allowlisted [diagnostic contract](docs/guides/diagnostics.md). Never log raw exceptions, SQL, request/session data or credentials; expected business failures stay out of diagnostic logs.
 - Supabase PostgreSQL owns workflow, holds, dependencies, specifications, human decisions, execution grants, and run metadata. Use relational constraints for core state and JSONB only for extensible data. GitHub owns repository/PR/CI facts; Supabase Storage is the preferred private artifact candidate. Never mirror an authoritative workflow state into GitHub Projects.
 
 ## Workflow and authority
