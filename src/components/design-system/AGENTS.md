@@ -1,14 +1,14 @@
-# Production graphite component system
+# Graphite component system
 
-- Reuse shared graphite/steel tokens, native semantic form recipes and Base UI/Liqui
-  primitives. `materials/chrome.tsx` is the small client island for navigation and
-  tools; dense server-rendered data remains on solid reading surfaces.
-- UI compositions accept presentation data, never import providers, fixtures or
-  database services. Preserve owner checks, RLS, revision/error/retry contracts.
-- Do not import experimental design-lab/workflow code. Status is read-only until
-  M1.3; there is no production Kanban, agent execution or fake data.
-- See DESIGN.md and docs/guides/visual-redesign.md for reuse, acquisition, licensing,
-  motion and browser evidence. New components need a concrete use case; no second
-  framework, copied registry globals or dependencies without review.
-- Preserve reduced-motion/transparency/high-contrast fallback on portal roots as
-  well as descendants. Forms keep native fields/fieldset and submit behavior.
+Follow the root instructions and [DESIGN.md](../../../DESIGN.md).
+
+- `theme/tokens.css` owns semantic values; keep registry styles scoped to
+  `workspace-theme`. `materials/chrome.tsx` is a client island; hook-free record
+  primitives remain usable on the server. Components accept presentation data,
+  never database services or provider clients.
+- Use native form recipes for static submits. The default glass Button is a
+  non-native action control; only solid/native variants can submit forms.
+- Read [component acquisition](../../../docs/design-system/README.md) before adding
+  a primitive; preserve its license, source hash and scoped tokens.
+- Preserve reduced-motion/transparency/high-contrast fallbacks on future portal
+  roots as well as descendants; do not hide focus indicators beneath glass layers.

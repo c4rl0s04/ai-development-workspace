@@ -1,6 +1,6 @@
 # M1.2 persistence
 
-M1.1 is merged at `53b7d7b`; the owner reports real Production GitHub authentication working. M1.2 is local-only. No hosted migration, data write, deployment, environment change or Git push is part of this milestone's implementation. Specification v0.2 remains unchanged.
+M1.1 is merged at `53b7d7b`; the owner reports real Production GitHub authentication working. M1.2 has since merged and the owner confirms hosted authentication and persistence work. The setup and rollout evidence below records the original milestone; Issue #7 live hardening and backup/restore acceptance remain separate. Specification v0.2 remains unchanged.
 
 ## Schema and decisions
 
@@ -74,7 +74,7 @@ The PostgreSQL suite requires a **local** administrative fixture connection that
 
 Drizzle Kit's old transitive esbuild has a development-server advisory. An exact nested override to esbuild 0.25.12 removes the audit finding; migration generation is verified with that override. Runtime packages are pinned independently.
 
-## Hosted rollout plan — approval required, not executed
+## Historical hosted rollout plan
 
 1. Review/resolve Issue #7 before putting real private data remotely: second real GitHub account denial (including RSC/API payloads), expiry/refresh and residual access after revocation, HTTPS host-only cookie flags, multi-tab behavior, no accidental caching and cross-project denial. Local fixtures are not live evidence. Confirm Production M1.1 behavior and MCP connection before/after any hosted work.
 2. Obtain separate approval for additive migrations to **existing project `tbifhoubudkmxeisvzhh` only**. Inspect PostgreSQL version, roles/default grants, existing schemas, connection mode/TLS CA, backups and restore procedure. Confirm `workspace` and `workspace_app` do not conflict with existing objects. Do not create another project, modify `auth`, expose the new schema through Data API or change OAuth/hooks/redirects.
@@ -86,7 +86,7 @@ Drizzle Kit's old transitive esbuild has a development-server advisory. An exact
 
 No significant architectural deviation from specification v0.2 is required. Physical decisions above are scoped M1.2 choices; M1.3 adds guarded transitions, dependencies, holds and audit; M1.4 adds immutable specifications, decisions, approvals and transactional outbox primitives.
 
-## Local validation record
+## Historical local validation record
 
 On 2026-10-17 with Node 24.21.0/npm 11.19.0: clean install, formatter/lint/typecheck, production build, 13 unit/render tests, 2 Auth HTTP scenarios, and 10 PostgreSQL TAP passes (9 scenarios plus parent). The migration generator reports no schema drift and npm audit reports zero vulnerabilities. The two-axis code review found no material blockers. A real owner browser session created a synthetic local project and repository association, created LOCAL-1 in Backlog, edited it to revision 2 and reloaded the saved record. Application restart persistence is independently covered by the PostgreSQL/HTTP suite. No second-account live login, wall-clock expiry/revocation or hosted persistence is claimed. No push or hosted CI run occurred.
 

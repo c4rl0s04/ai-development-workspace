@@ -237,3 +237,11 @@ The parent subsequently repeated browser checks on a fresh post-build local harn
 ## Final PR preparation (2026-10-20)
 
 A1 from the separate frontend review is fixed without changing architecture. Final local checks passed: format, lint, TypeScript, 22 unit/render tests, build, 2 HTTP tests and 11 PostgreSQL TAP passes. Six actual compiled-CSS loading-component browser cases passed in Chromium/WebKit at 1440/390/320px. The full diff still leaves domain/application/auth/database/server/API/migrations unchanged. B1 and B2 remain separate actionable issues (#10/#11), with risk and acceptance criteria; MCP writes must not be enabled before #10 is satisfied. No live provider or hosted configuration verification is claimed by this final correction.
+
+## Local stabilization addendum — 2026-10-20
+
+Obsolete branch/worktree/publication gates have been removed from root instructions; guides identify historical milestone evidence and current implemented scope. Permanent owner/CSRF/RLS/revision and human authority rules remain. The non-native Button stays a reusable action primitive; static POST logout uses the existing native recipe and no longer loads its interactive factory.
+
+No domain, application, database/schema, server or authentication logic changes are part of stabilization. Playwright's local fixture issuer and disposable PostgreSQL databases live in tests, outside application routes/build entry points. They use actual authorization/services/RLS rather than a production bypass. A pinned development dependency and one-worker CI smoke gate address the earlier browser-regression coverage gap without adding an architecture framework.
+
+Newly executed local checks and rendering/performance observations are recorded in [the stabilization report](m122-stabilization.md), distinctly from the original reviewers' parent-reported evidence. B1/#10 and B2/#11 remain inherited, unimplemented follow-ups; #10 must pass before MCP writes are enabled. Boundary/cycle tooling remains a future bounded recommendation, not a newly discovered defect. No hosted state was inspected or changed and no new remote CI result is claimed.

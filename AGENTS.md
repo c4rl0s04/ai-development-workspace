@@ -2,8 +2,8 @@
 
 ## Current foundation
 
-- The root Next.js 16 / React / TypeScript / Tailwind application has an M1.1 owner-only Supabase/GitHub browser auth boundary on M0. `src/app/(workspace)` protects the dashboard; M1.1 is merged and Production login is owner-confirmed. M1.2 implements local PostgreSQL project/task persistence; Approvals remains a placeholder. No MCP or runner is implemented. Issue #7 live hardening remains a hosted-private-data prerequisite.
-- [Technical specification v0.2](docs/architecture/technical-spec-v0.2.md) is the architectural source of truth. It is a draft awaiting human review; distinguish its required invariants from provisional provider choices. Read the sections relevant to a change before implementation and surface architectural conflicts before proceeding.
+- The root Next.js 16 / React / TypeScript / Tailwind application has an M1.1 owner-only Supabase/GitHub browser auth boundary on M0. `src/app/(workspace)` protects the dashboard; M1.1 is merged and Production login is owner-confirmed. M1.2 implements PostgreSQL project/task persistence, merged and deployed with owner-confirmed behavior; Approvals remains a placeholder. No MCP or runner is implemented. Issue #7 live hardening remains a hosted-private-data prerequisite.
+- [Technical specification v0.2](docs/architecture/technical-spec-v0.2.md) is the architectural source of truth. Distinguish its required invariants from provisional provider choices and historical milestone status. Read the sections relevant to a change before implementation and surface architectural conflicts before proceeding.
 - Work through the specification's focused, independently verifiable milestones. Update documented decisions and real validation commands as implementation makes them concrete. New infrastructure, dependencies, or abstractions require a current milestone need; keep unrelated work out of scope.
 
 ## Implementation boundaries
@@ -30,7 +30,6 @@ Use relevant installed global skills when they materially support the milestone;
 - Every future private service/loader must call `requireOwner()` and cookie-authenticated POST mutations must call `requireOwnerMutation(request)` from `src/server/auth.ts`. Neither a protected layout nor Proxy is sufficient authorization for data operations. Never accept a caller-supplied principal; never authorize from `getSession()` or mutable metadata.
 - Auth runtime requires `APP_URL`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` and `OWNER_GITHUB_ID`, all server-only. Build succeeds without them; runtime access fails closed. Use `.env.example` and [owner-auth setup](docs/guides/owner-auth.md). Do not log tokens, codes, cookies or provider responses. Never copy OAuth-spike configuration into this app. The independent `spike/remote-mcp-auth` branch and its Vercel project remain separate; do not import spike modules, provision resources, change its Root Directory, or push/deploy without explicit authorization.
 - Completion requires focused tests and a production build, honest placeholder copy, accessible responsive navigation, no secrets or generated artifacts, and preservation of the workflow/authority rules above.
-- Do not push/deploy this auth branch until local OAuth succeeds and branch-specific Vercel Preview variables/callback are configured. Reuse the existing shared Supabase project tbifhoubudkmxeisvzhh; no new project or GitHub OAuth App. Do not change the existing MCP Supabase project, hooks, OAuth callbacks or deployment. GitHub Actions can verify local mock behavior but does not replace the live checklist in the auth guide.
 
 <!-- BEGIN:nextjs-agent-rules -->
 
@@ -44,11 +43,10 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## M1.2 persistence
 
-- Work only in the M1.2 worktree/branch from merged main. No push, deploy, hosted migration or cloud settings change is authorized by local implementation. Preserve all Auth/MCP settings.
 - `src/domain/workspace.ts` owns records/Zod invariants; `src/application/workspace.ts` authorizes every use case; `src/infrastructure/db` holds schema/connection/Drizzle adapter; `src/server/workspace.ts` composes server-only services. Pages/JSON handlers use these services, never direct database queries. Client identities/status overrides are not trusted.
 - Migrations live under `drizzle/`; the second is hand-reviewed access SQL. Runtime uses only the non-owner `workspace_app` role, verified TLS remotely and transaction-local owner context. RLS/column grants are defense in depth, never a substitute for requireOwner/requireOwnerMutation. Never configure migration/postgres/service-role credentials as DATABASE_URL.
 - Project keys and task numbers are immutable. Task number allocation and insert share a transaction; revision-checked edits include repository changes atomically. Tasks enter Backlog; no status transitions, permanent deletion, team tables or agent infrastructure in M1.2. Repository replacements retire associations.
-- See [persistence guide](docs/guides/persistence.md) for Docker/local-only migration commands, role setup, environment variables and hosted approval checklist. Add `npm run test:db` (local TEST_DATABASE_URL) after the existing build/HTTP checks. Ordinary `.test.ts` files under tests/unit and PostgreSQL `.test.ts` files under tests/integration are explicitly included in npm/CI. Test databases are randomly named and isolated; never truncate development or hosted data.
+- See [persistence guide](docs/guides/persistence.md) for Docker/local-only migration commands, role setup, environment variables and hosted approval checklist. Run `npm run test:db` (local TEST_DATABASE_URL) after the existing build/HTTP checks. Ordinary `.test.ts` files under tests/unit and PostgreSQL `.test.ts` files under tests/integration are explicitly included in npm/CI. Test databases are randomly named and isolated; never truncate development or hosted data.
 - Do not introduce real private data remotely until Issue #7 live second-account, expiry/revocation and cookie/cache boundaries are reviewed. Report fixture-tested behavior separately from live evidence. M1.3/M1.4 add workflow audit and specification/decision/outbox behavior.
 
 ## Frontend foundation
@@ -69,9 +67,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Preserve native form locking, validation/focus, duplicate-key correction,
   revision denial and uncertain-create reconciliation. Use read-only status until
   M1.3; do not expose arbitrary transitions through a new visual control.
-- Use Impeccable's current launcher/context once per task, preserve the established
-  Operate direction, review rendered desktop/mobile/browser states, then make a
-  bounded correction/confirmation. Verify hook dispatch or run its manual scan;
-  no reinstall is needed. Evidence/limitations live in docs/guides/visual-redesign.md.
-- This feature worktree is based on fresh main. Local commits only are authorized;
-  no push, merge, deployment, database/cloud change or MCP modification is implied.
+- For substantial visual changes, use Impeccable and preserve the established
+  Operate direction. Review rendered desktop/mobile, keyboard and error states.
+  Evidence and limits live in docs/guides/visual-redesign.md.
+- Publication (push/PR), merge, deployment and cloud changes require authorization
+  in the current task; local implementation does not imply it. Preserve the
+  shared Supabase project and independent MCP service configuration.
+- Browser smoke tests use only local PostgreSQL and fixture authentication; see
+  docs/guides/browser-smoke.md. Keep test issuers and data out of application routes.

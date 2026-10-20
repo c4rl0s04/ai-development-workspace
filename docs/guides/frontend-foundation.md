@@ -1,5 +1,8 @@
 # M1.2.1 — frontend foundation and validation
 
+Historical M1.2.1 record. See [M1.2.2](visual-redesign.md) for later fixture-browser
+evidence; live provider/device validation remains separate.
+
 Based on main `d5b357c` and the independent frontend audit. No new dependencies,
 provider settings, schema changes or workflow transitions are introduced.
 
@@ -86,10 +89,9 @@ before proposing infrastructure changes.
   cross-project isolation, atomic numbering, revision conflicts, rollback and
   HTTP persistence across process restarts. Run after the build, not concurrently
   with it. Tests create/drop only their isolated local database.
-- Browser control is unavailable: `Sky Computer Use native pipe startup failed`.
+- Browser control was unavailable during this milestone: `Sky Computer Use native pipe startup failed`.
   Visual desktop/mobile, real keyboard/screen reader behavior, authenticated
-  browser navigation, LCP/INP/CLS and live OAuth remain unverified here. Complete
-  those before release; DOM/HTTP fixtures are not live authentication evidence.
+  browser navigation, LCP/INP/CLS and live OAuth remain unverified here. See the M1.2.2 guide for later browser evidence; DOM/HTTP fixtures are not live authentication evidence.
 
 M1.3 owns board/card interactions, seven-state transition rules, On Hold
 projection, dependencies and history. Do not add unrestricted status controls,

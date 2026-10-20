@@ -1,5 +1,10 @@
 # M1.2.2 production frontend migration
 
+The original migration evidence below is historical. See the
+[final stabilization report](../reviews/m122-stabilization.md) for current smoke
+commands, actual 200% zoom/fallback checks and the reproducible base/final cost
+comparison. Original limitations are not automatically current or resolved.
+
 ## Scope and architecture
 
 Feature `feature/m1-visual-redesign` starts from fetched origin/main8b7209c
