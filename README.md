@@ -84,3 +84,12 @@ See [AGENTS.md](AGENTS.md) for contributor commands and invariants. Changes to p
 Follow [the local database guide](docs/guides/persistence.md) to start Docker PostgreSQL, apply the two checked migrations and configure the local runtime role. Then run `npm run test:db` with the documented local TEST_DATABASE_URL after the production build. CI runs this integration suite as well as all commands above. The suite verifies RLS with the actual non-owner runtime role, concurrent numbering, stale edits, rollback and persistence across Next.js process restarts. Destructive deletion is deliberately absent.
 
 M1.2.1 local validation (Node 24.21.0 / npm 11.19.0): clean installation, formatting, lint, typecheck and production build passed. **20 unit/render/DOM tests, 2 Auth HTTP scenarios and 11 PostgreSQL TAP tests passed.** RLS, atomic task numbering, revision conflicts, rollback and persistence across process restarts remain covered. Hosted CI and live browser/OAuth were not rerun for this unpushed branch. See [frontend changes, measurements and validation limits](docs/guides/frontend-foundation.md).
+
+## Graphite frontend
+
+The application UI uses the approved graphite/steel Liquid Glass foundation:
+frosted navigation/tools with solid server-rendered records and native forms.
+See [DESIGN.md](DESIGN.md), [component reuse](docs/design-system/README.md), and
+[local migration validation](docs/guides/visual-redesign.md). Experimental fixtures,
+design-lab routes and the conceptual Kanban are not part of this application.
+Existing authentication, persistence and validation commands remain unchanged.
