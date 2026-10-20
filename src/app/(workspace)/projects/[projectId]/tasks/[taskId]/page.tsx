@@ -27,7 +27,7 @@ export default async function TaskPage({
     const p = await params;
     result = await workspace.getTask(p.projectId, p.taskId);
   } catch (error) {
-    return pageError(error);
+    return pageError(error, 'tasks.get');
   }
   const { project, task } = result;
   const href = `/projects/${project.id}/tasks/${task.id}`;

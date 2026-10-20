@@ -3,6 +3,7 @@ import type { WorkspaceStore } from '../../application/workspace';
 import { WorkspaceError, pageSize, type Project } from '../../domain/workspace';
 import { users, projects, repositories, tasks } from './schema';
 import type { connectDatabase } from './connection';
+import { databaseFailure, markFailure } from '../diagnostics';
 
 type Database = ReturnType<typeof connectDatabase>['db'];
 type Tx = Parameters<Parameters<Database['transaction']>[0]>[0];
@@ -39,9 +40,12 @@ export function postgresWorkspaceStore(db: Database): WorkspaceStore {
           sql`select current_user as role, (rolsuper or rolbypassrls) as unsafe from pg_roles where rolname=current_user`,
         );
         if (role[0]?.role !== 'workspace_app' || role[0]?.unsafe)
-          throw new WorkspaceError(
-            'unavailable',
-            'Storage role is not configured safely.',
+          throw markFailure(
+            new WorkspaceError(
+              'unavailable',
+              'Storage role is not configured safely.',
+            ),
+            'database_role',
           );
         // Transaction-local context cannot leak when a pooled connection is reused.
         await tx.execute(
@@ -65,9 +69,12 @@ export function postgresWorkspaceStore(db: Database): WorkspaceStore {
           'unique_conflict',
           'That project key or repository association already exists. Choose a unique key or reload.',
         );
-      throw new WorkspaceError(
-        'unavailable',
-        'Storage is temporarily unavailable. The save could not be confirmed; reload before retrying.',
+      throw databaseFailure(
+        new WorkspaceError(
+          'unavailable',
+          'Storage is temporarily unavailable. The save could not be confirmed; reload before retrying.',
+        ),
+        error,
       );
     }
   }

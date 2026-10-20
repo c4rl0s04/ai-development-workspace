@@ -33,8 +33,10 @@ export function Pagination({
 }
 export function RecordUnavailable({
   message = 'Storage is temporarily unavailable. No successful save is assumed. Try reloading.',
+  reference,
 }: {
   message?: string;
+  reference?: string;
 }) {
   return (
     <RecordPanel>
@@ -42,6 +44,11 @@ export function RecordUnavailable({
       <p role="alert" className="mt-3 text-muted">
         {message}
       </p>
+      {reference ? (
+        <p className="mt-3 break-words text-sm text-muted">
+          Reference: {reference}
+        </p>
+      ) : null}
       <Link
         href="/projects"
         className="mt-5 inline-flex min-h-11 items-center underline"

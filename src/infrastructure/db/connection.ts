@@ -1,6 +1,7 @@
 import postgres from 'postgres';
 import { drizzle } from 'drizzle-orm/postgres-js';
 import { WorkspaceError } from '../../domain/workspace';
+import { markFailure } from '../diagnostics';
 
 export function connectDatabase(value: string | undefined) {
   try {
@@ -28,9 +29,9 @@ export function connectDatabase(value: string | undefined) {
     });
     return { client, db: drizzle(client) };
   } catch {
-    throw new WorkspaceError(
-      'unavailable',
-      'Storage is temporarily unavailable.',
+    throw markFailure(
+      new WorkspaceError('unavailable', 'Storage is temporarily unavailable.'),
+      'database_configuration',
     );
   }
 }

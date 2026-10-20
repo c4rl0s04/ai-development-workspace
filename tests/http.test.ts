@@ -93,16 +93,23 @@ async function startApp(authOrigin?: string) {
         OWNER_GITHUB_ID: owner,
         DATABASE_URL: '',
       },
-      stdio: 'ignore',
+      stdio: ['ignore', 'pipe', 'pipe'],
     },
   );
+  let output = '';
+  child.stdout?.on('data', (chunk) => {
+    output += chunk.toString();
+  });
+  child.stderr?.on('data', (chunk) => {
+    output += chunk.toString();
+  });
   for (let attempt = 0; attempt < 100; attempt++) {
     try {
       if (
         (await fetch(`${origin}/login`, { signal: AbortSignal.timeout(500) }))
           .ok
       )
-        return { origin, child };
+        return { origin, child, output: () => output };
     } catch {
       /* Local startup only. */
     }
@@ -339,8 +346,41 @@ test('built app enforces real SSR cookie boundaries with a local mock Auth serve
     );
     assert.equal((await get('/api/projects')).status, 401);
     assert.equal((await get('/api/projects', session(token('2')))).status, 403);
-    const unavailableStorage = await get('/api/projects', session());
+    const sentinel = 'untrusted-sensitive-correlation-fixture';
+    const unavailableStorage = await fetch(`${app.origin}/api/projects`, {
+      headers: { Cookie: session(), 'X-Correlation-ID': sentinel },
+    });
     assert.equal(unavailableStorage.status, 503);
+    const reference = unavailableStorage.headers.get('x-correlation-id');
+    assert.ok(reference);
+    assert.match(reference ?? '', /^[0-9a-f]{8}-[0-9a-f-]{27}$/);
+    for (
+      let attempt = 0;
+      attempt < 20 && !app.output().includes(reference);
+      attempt++
+    )
+      await new Promise((resolve) => setTimeout(resolve, 25));
+    const events = app
+      .output()
+      .split('\n')
+      .filter((line) => line.startsWith('{"event":"server_failure"'))
+      .map((line) => JSON.parse(line));
+    assert.deepEqual(
+      events.filter((event) => event.correlationId === reference),
+      [
+        {
+          event: 'server_failure',
+          correlationId: reference,
+          operation: 'projects.list',
+          category: 'database_configuration',
+        },
+      ],
+    );
+    assert.ok(!app.output().includes(sentinel));
+    assert.equal(
+      (await get('/api/projects')).headers.get('x-correlation-id'),
+      null,
+    );
     assert.doesNotMatch(
       await unavailableStorage.text(),
       /postgresql:|DATABASE_URL|password/i,

@@ -10,6 +10,7 @@ import { connectDatabase } from '../../src/infrastructure/db/connection';
 import { postgresWorkspaceStore } from '../../src/infrastructure/db/workspace-store';
 import { workspaceService } from '../../src/application/workspace';
 import { WorkspaceError, taskKey } from '../../src/domain/workspace';
+import { reportFailure } from '../../src/infrastructure/diagnostics';
 
 test('real PostgreSQL: migrations, constraints, RLS, concurrent writes, rollback and HTTP persistence', {
   timeout: 120000,
@@ -130,6 +131,48 @@ test('real PostgreSQL: migrations, constraints, RLS, concurrent writes, rollback
       title: 'First task',
       description: 'Persistent details',
     });
+    await t.test(
+      'permission failures preserve safe diagnostics and roll back owner context',
+      async () => {
+        const events: string[] = [];
+        const original = console.error;
+        console.error = (event: string) => {
+          events.push(event);
+        };
+        try {
+          await migrator.client`revoke select on workspace.tasks from workspace_app`;
+          await assert.rejects(
+            () => service.getProject(first.id),
+            (error: unknown) => {
+              assert.ok(error instanceof WorkspaceError);
+              assert.equal(error.code, 'unavailable');
+              const reference = reportFailure(error, 'projects.get');
+              assert.deepEqual(JSON.parse(events[0]), {
+                event: 'server_failure',
+                correlationId: reference,
+                operation: 'projects.get',
+                category: 'database_permission',
+                sqlState: '42501',
+              });
+              assert.equal(error.cause, undefined);
+              return true;
+            },
+          );
+          assert.equal(events.length, 1);
+          assert.equal(
+            (await runtime.client`select * from workspace.projects`).length,
+            0,
+          );
+        } finally {
+          console.error = original;
+          await migrator.client`grant select on workspace.tasks to workspace_app`;
+        }
+        assert.equal(
+          (await service.getTask(first.id, task.id)).task.revision,
+          1,
+        );
+      },
+    );
     await t.test(
       'concurrent task allocation is unique, local and stable',
       async () => {
@@ -371,6 +414,11 @@ test('real PostgreSQL: migrations, constraints, RLS, concurrent writes, rollback
         const badUrl = new URL(runtimeUrl);
         badUrl.port = '1';
         const broken = connectDatabase(badUrl.toString());
+        const events: string[] = [];
+        const original = console.error;
+        console.error = (event: string) => {
+          events.push(event);
+        };
         try {
           await assert.rejects(
             () =>
@@ -378,12 +426,23 @@ test('real PostgreSQL: migrations, constraints, RLS, concurrent writes, rollback
                 title: 'Unavailable',
                 description: '',
               }),
-            (e: unknown) =>
-              e instanceof WorkspaceError &&
-              e.code === 'unavailable' &&
-              !e.message.includes('postgres://'),
+            (e: unknown) => {
+              assert.ok(e instanceof WorkspaceError);
+              assert.equal(e.code, 'unavailable');
+              const reference = reportFailure(e, 'tasks.create');
+              assert.deepEqual(JSON.parse(events[0]), {
+                event: 'server_failure',
+                correlationId: reference,
+                operation: 'tasks.create',
+                category: 'database_connection',
+              });
+              assert.ok(!e.message.includes('postgres://'));
+              return true;
+            },
           );
+          assert.equal(events.length, 1);
         } finally {
+          console.error = original;
           await broken.client.end();
         }
       },
