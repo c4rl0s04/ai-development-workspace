@@ -86,23 +86,26 @@ export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
       setPending(false);
     }
   }
-  const fieldClass =
-    'mt-2 block w-full rounded-lg border border-control bg-white px-3 py-2.5 text-ink';
+  const fieldClass = 'workspace-field';
   function errors(key: string) {
     return fields[key]?.length ? (
-      <p id={`${key}-error`} className="mt-2 text-sm text-red-800">
+      <p id={`${key}-error`} className="workspace-field-error">
         {fields[key].join(' ')}
       </p>
     ) : null;
   }
   return (
-    <form onSubmit={submit} className="max-w-2xl space-y-6" aria-busy={busy}>
+    <form
+      onSubmit={submit}
+      className="workspace-form space-y-6"
+      aria-busy={busy}
+    >
       {error ? (
         <div
           ref={alertRef}
           tabIndex={-1}
           role="alert"
-          className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-900"
+          className="workspace-alert workspace-alert--error"
         >
           <p>{error}</p>
           {conflict ? (
@@ -113,7 +116,10 @@ export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
         </div>
       ) : null}
       {uncertain ? (
-        <section aria-label="Reconcile previous create" className="space-y-3">
+        <section
+          aria-label="Reconcile previous create"
+          className="workspace-alert workspace-alert--warning space-y-3"
+        >
           <p>
             The previous create may have succeeded. Do not submit again until
             you check the saved list for this project key or task title and
@@ -153,7 +159,7 @@ export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
       ) : null}
       <fieldset disabled={busy} className="min-w-0 space-y-5">
         <div>
-          <label htmlFor={titleField} className="font-medium">
+          <label htmlFor={titleField} className="workspace-field-label">
             {kind === 'project' ? 'Project name' : 'Task title'}
           </label>
           <input
@@ -172,7 +178,7 @@ export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
         </div>
         {kind === 'project' && !initial ? (
           <div>
-            <label htmlFor="key" className="font-medium">
+            <label htmlFor="key" className="workspace-field-label">
               Project key
             </label>
             <input
@@ -187,7 +193,7 @@ export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
               aria-invalid={!!fields.key}
               aria-describedby={fields.key ? 'key-hint key-error' : 'key-hint'}
             />
-            <p id="key-hint" className="mt-2 text-sm text-muted">
+            <p id="key-hint" className="workspace-field-hint">
               2–10 letters or digits. The key cannot change; task identifiers
               will use it, for example ELS-1.
             </p>
@@ -195,7 +201,7 @@ export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
           </div>
         ) : null}
         <div>
-          <label htmlFor="description" className="font-medium">
+          <label htmlFor="description" className="workspace-field-label">
             Description (optional)
           </label>
           <textarea
@@ -214,7 +220,7 @@ export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
         </div>
         {kind === 'project' ? (
           <div>
-            <label htmlFor="repositoryUrl" className="font-medium">
+            <label htmlFor="repositoryUrl" className="workspace-field-label">
               GitHub repository URL (optional)
             </label>
             <input
@@ -232,23 +238,23 @@ export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
                   : 'repository-hint'
               }
             />
-            <p id="repository-hint" className="mt-2 text-sm text-muted">
+            <p id="repository-hint" className="workspace-field-hint">
               Association only. No repository permissions or GitHub API access
               are requested. Clear this field to retire the current link.
             </p>
             {errors('repositoryUrl')}
           </div>
         ) : (
-          <p className="text-sm text-muted">
+          <p className="workspace-field-hint">
             New tasks enter Backlog. Status transitions and approvals arrive in
             later milestones.
           </p>
         )}
-        <div className="flex flex-wrap items-center gap-4">
+        <div className="workspace-form-actions">
           <button
             type="submit"
             disabled={busy || conflict || uncertain}
-            className="min-h-11 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-60"
+            className="workspace-button workspace-button--primary"
           >
             {busy ? 'Saving…' : initial ? 'Save changes' : `Create ${kind}`}
           </button>
@@ -258,11 +264,11 @@ export function RecordForm({ kind, endpoint, cancelHref, initial }: Props) {
             onClick={(event) => {
               if (busy) event.preventDefault();
             }}
-            className="inline-flex min-h-11 items-center underline"
+            className="workspace-button workspace-button--secondary"
           >
             Cancel
           </Link>
-          <span role="status" className="text-sm text-muted">
+          <span role="status" className="workspace-field-hint">
             {busy ? 'Saving your changes…' : ''}
           </span>
         </div>

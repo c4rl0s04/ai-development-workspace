@@ -2,7 +2,10 @@ import Link from 'next/link';
 
 export default function NotFound() {
   return (
-    <>
+    <main
+      id="main-content"
+      className="mx-auto max-w-2xl rounded-2xl bg-surface p-6 sm:mt-12 sm:p-10"
+    >
       <h1 className="text-3xl font-semibold tracking-tight">Page not found</h1>
       <p className="mt-4 text-muted">This page is not part of the workspace.</p>
       <Link
@@ -11,6 +14,6 @@ export default function NotFound() {
       >
         Return to overview
       </Link>
-    </>
+    </main>
   );
 }

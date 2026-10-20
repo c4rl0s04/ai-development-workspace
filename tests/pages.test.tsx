@@ -42,3 +42,23 @@ test('approval copy keeps approval and execution authorization distinct', () => 
 test('unknown-page component offers a route back into the workspace', () => {
   assert.match(renderToStaticMarkup(<NotFound />), /href="\/"/);
 });
+
+test('server record presentation keeps status read-only and repository context accessible', async () => {
+  const { StatusBadge, RepositoryLink } = await import(
+    '../src/components/workspace-records'
+  );
+  const status = renderToStaticMarkup(<StatusBadge status="backlog" />);
+  assert.match(status, /data-status="backlog"/);
+  assert.match(status, /Backlog/);
+  assert.doesNotMatch(status, /<button|<select/);
+  const repository = renderToStaticMarkup(
+    <RepositoryLink url="https://github.com/example/workspace" />,
+  );
+  assert.match(repository, /href="https:\/\/github.com\/example\/workspace"/);
+  assert.match(repository, /noopener noreferrer/);
+  assert.match(repository, /opens in a new tab/);
+  assert.match(
+    renderToStaticMarkup(<RepositoryLink url={null} />),
+    /No repository associated/,
+  );
+});

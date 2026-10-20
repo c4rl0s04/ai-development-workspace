@@ -9,7 +9,7 @@ export function PageHeading({
   actions?: ReactNode;
 }) {
   return (
-    <header className="mb-6 flex flex-wrap items-start justify-between gap-4">
+    <header className="production-page-heading flex flex-wrap items-start justify-between gap-4">
       <div className="min-w-0 max-w-full">
         <h1 className="break-words text-2xl font-semibold tracking-tight sm:text-3xl">
           {title}

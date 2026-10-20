@@ -33,10 +33,10 @@ export default async function Login({
       : undefined
     : messages.unavailable;
   return (
-    <main
-      id="main-content"
-      className="mx-auto flex min-h-dvh max-w-lg flex-col justify-center px-6 py-12"
-    >
+    <main id="main-content" className="workspace-login">
+      <p className="mb-6 text-xs font-medium uppercase tracking-widest text-muted">
+        AI Development Workspace
+      </p>
       <h1 className="text-3xl font-semibold tracking-tight">
         Sign in to your workspace
       </h1>
@@ -47,7 +47,7 @@ export default async function Login({
       {message ? (
         <p
           role="alert"
-          className="mt-6 rounded-lg border border-line bg-white p-4 text-sm leading-6"
+          className="mt-6 rounded-lg border border-line bg-surface p-4 text-sm leading-6"
         >
           {message}
         </p>
@@ -56,7 +56,7 @@ export default async function Login({
         <form action="/auth/login" method="post" className="mt-8">
           <button
             type="submit"
-            className="min-h-12 rounded-lg bg-accent px-5 py-3 font-medium text-white hover:bg-accent-hover"
+            className="workspace-button workspace-button--primary w-full"
           >
             Continue with GitHub
           </button>

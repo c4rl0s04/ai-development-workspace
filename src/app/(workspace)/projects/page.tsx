@@ -5,6 +5,7 @@ import {
   actionClass,
   Pagination,
   RecordPanel,
+  RepositoryLink,
 } from '@/components/workspace-records';
 import { workspace } from '@/server/workspace';
 import { pageError } from '@/server/page-error';
@@ -38,24 +39,25 @@ export default async function Projects({
         {result.items.length ? (
           <ul className="divide-y divide-line">
             {result.items.map((project) => (
-              <li key={project.id} className="py-4 first:pt-0 last:pb-0">
-                <Link
-                  href={`/projects/${project.id}`}
-                  className="inline-flex min-h-11 items-center break-words font-semibold underline decoration-line hover:decoration-accent"
-                >
-                  {project.name}
-                </Link>
-                <span className="ml-3 rounded bg-canvas px-2 py-1 text-xs font-medium">
-                  {project.key}
-                </span>
-                <p className="mt-1 line-clamp-2 whitespace-pre-wrap text-sm leading-6 text-muted">
+              <li
+                key={project.id}
+                className="production-record-row production-project-row"
+              >
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <span className="production-record-key">{project.key}</span>
+                  <Link
+                    href={`/projects/${project.id}`}
+                    className="inline-flex min-h-11 min-w-0 items-center break-words text-base font-semibold hover:text-accent"
+                  >
+                    {project.name}
+                  </Link>
+                </div>
+                <p className="mt-1 max-w-3xl line-clamp-2 whitespace-pre-wrap break-words text-sm leading-6 text-muted">
                   {project.description || 'No description yet.'}
                 </p>
-                {project.repositoryUrl ? (
-                  <p className="mt-2 break-all text-sm text-muted">
-                    {project.repositoryUrl}
-                  </p>
-                ) : null}
+                <div className="mt-2">
+                  <RepositoryLink url={project.repositoryUrl} />
+                </div>
               </li>
             ))}
           </ul>

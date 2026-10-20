@@ -10,7 +10,7 @@ export default function Overview() {
       />
       <section
         aria-labelledby="workspace-title"
-        className="overflow-hidden rounded-2xl border border-line bg-white"
+        className="overflow-hidden rounded-2xl border border-line bg-surface"
       >
         <div className="border-b border-line px-5 py-4">
           <h2 id="workspace-title" className="text-lg font-semibold">
@@ -23,7 +23,7 @@ export default function Overview() {
         </div>
         <Link
           href="/projects"
-          className="group flex items-center justify-between gap-5 px-5 py-4 hover:bg-canvas"
+          className="production-overview-link group flex items-center justify-between gap-5 px-5 py-4 hover:bg-canvas"
         >
           <div>
             <h3 className="font-semibold">Projects</h3>
@@ -37,7 +37,7 @@ export default function Overview() {
         </Link>
         <Link
           href="/approvals"
-          className="flex items-center justify-between gap-5 border-t border-line px-5 py-4 hover:bg-canvas"
+          className="production-overview-link flex items-center justify-between gap-5 border-t border-line px-5 py-4 hover:bg-canvas"
         >
           <div>
             <h3 className="font-semibold">Approvals</h3>

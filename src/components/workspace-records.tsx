@@ -1,13 +1,10 @@
+import { Badge, Skeleton } from './design-system/ui/primitives';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
-export const actionClass =
-  'inline-flex min-h-11 items-center rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white hover:bg-accent-hover';
+import { statusLabels, type Task } from '@/domain/workspace';
+export const actionClass = 'workspace-button workspace-button--primary';
 export function RecordPanel({ children }: { children: ReactNode }) {
-  return (
-    <section className="rounded-xl border border-line bg-white p-4 sm:p-5">
-      {children}
-    </section>
-  );
+  return <section className="production-panel">{children}</section>;
 }
 export function Pagination({
   page,
@@ -19,10 +16,7 @@ export function Pagination({
   href: string;
 }) {
   return (
-    <nav
-      aria-label="Pagination"
-      className="mt-6 flex items-center gap-6 text-sm"
-    >
+    <nav aria-label="Pagination" className="production-pagination">
       {page > 1 ? (
         <Link href={`${href}?page=${page - 1}`} className="underline">
           Previous
@@ -64,7 +58,7 @@ export function Breadcrumbs({
   items: { label: string; href?: string }[];
 }) {
   return (
-    <nav aria-label="Breadcrumb" className="mb-4 text-sm text-muted">
+    <nav aria-label="Breadcrumb" className="production-breadcrumbs mb-3">
       <ol className="flex flex-wrap items-center gap-x-2 gap-y-1">
         {items.map((item, index) => (
           <li
@@ -95,19 +89,48 @@ export function WorkspaceLoading() {
     <div role="status" aria-label="Loading workspace" className="space-y-6">
       <p className="text-sm text-muted">Loading workspace…</p>
       <div aria-hidden="true" className="space-y-4">
-        <div className="h-8 w-48 rounded bg-line" />
-        <div className="rounded-xl border border-line bg-white p-5">
+        <Skeleton className="h-8 w-48 rounded bg-line" />
+        <div className="rounded-xl border border-line bg-surface p-5">
           {[1, 2, 3].map((row) => (
             <div
               key={row}
               className="flex h-16 items-center gap-4 border-b border-line last:border-0"
             >
-              <div className="h-4 w-16 rounded bg-line" />
-              <div className="h-4 w-1/2 rounded bg-sidebar" />
+              <Skeleton className="h-4 w-16 rounded bg-line" />
+              <Skeleton className="h-4 w-1/2 rounded bg-sidebar" />
             </div>
           ))}
         </div>
       </div>
     </div>
+  );
+}
+
+export function StatusBadge({ status }: { status: Task['status'] }) {
+  return (
+    <Badge className="production-status" data-status={status}>
+      {statusLabels[status]}
+    </Badge>
+  );
+}
+
+export function RepositoryLink({ url }: { url: string | null }) {
+  if (!url)
+    return (
+      <span className="production-repository">No repository associated</span>
+    );
+  return (
+    <a
+      href={url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="production-repository underline decoration-line underline-offset-4 hover:text-ink"
+    >
+      <span className="min-w-0 break-all">
+        {url.replace('https://github.com/', '')}
+      </span>
+      <span aria-hidden="true">↗</span>
+      <span className="sr-only"> (opens in a new tab)</span>
+    </a>
   );
 }

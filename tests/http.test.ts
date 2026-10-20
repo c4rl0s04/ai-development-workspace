@@ -454,6 +454,16 @@ test('unconfigured deployment builds but fails closed without private content', 
     const response = await fetch(app.origin);
     assert.equal(response.status, 503);
     assert.doesNotMatch(await response.text(), /Your workspace, taking shape/);
+    for (const path of [
+      '/design-lab',
+      '/design-lab/components',
+      '/design-lab/kanban',
+    ]) {
+      for (const headers of [new Headers(), new Headers({ RSC: '1' })]) {
+        const experiment = await fetch(`${app.origin}${path}`, { headers });
+        assert.equal(experiment.status, 404);
+      }
+    }
     const login = await fetch(`${app.origin}/login`);
     assert.equal(login.status, 200);
     const html = await login.text();
